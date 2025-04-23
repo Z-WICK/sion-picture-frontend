@@ -4,10 +4,14 @@
       <a-layout-header class="header">
         <GlobalHeader />
       </a-layout-header>
+      <a-layout>
+        <GlobalSider />
+        <a-layout-content class="content">
+          <router-view />
+        </a-layout-content>
+      </a-layout>
 
-      <a-layout-content class="content">
-        <router-view />
-      </a-layout-content>
+
 
       <a-layout-footer class="footer">
         <a href="https://www.codefather.cn" target="_blank"> SionNetWork by Sion </a>
@@ -18,6 +22,7 @@
 
 <script setup lang="ts">
 import GlobalHeader from '@/components/GlobalHeader.vue'
+import GlobalSider from '@/components/GlobalSider.vue'
 </script>
 
 <style scoped>
