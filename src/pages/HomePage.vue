@@ -70,6 +70,7 @@ const fetchData = async () => {
   // 转换搜索参数
   const params = {
     ...searchParams,
+    nullSpaceId: true,
     tags: [] as string[],
   }
   if (selectedCategory.value !== 'all') {
@@ -81,7 +82,7 @@ const fetchData = async () => {
       params.tags.push(tagList.value[index])
     }
   })
-  const res = await listPictureByPageWithCacheUsingPost(params)
+  const res = await listPictureVoByPageUsingPost(params)
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0
