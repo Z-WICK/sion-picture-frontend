@@ -14,7 +14,7 @@
 
 
       <a-layout-footer class="footer">
-        <a href="https://www.codefather.cn" target="_blank"> SionNetWork by Sion </a>
+        <a href="https://blog.johncloud.us.kg" target="_blank"> SionNetWork by Sion </a>
       </a-layout-footer>
     </a-layout>
   </div>

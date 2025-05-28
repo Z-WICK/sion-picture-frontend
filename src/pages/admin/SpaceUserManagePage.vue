@@ -54,7 +54,7 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { SPACE_ROLE_OPTIONS } from '../../constants/space.ts'
+import { SPACE_ROLE_OPTIONS } from '@/constants/space.ts'
 import {
   addSpaceUserUsingPost,
   deleteSpaceUserUsingPost,
@@ -62,6 +62,7 @@ import {
   listSpaceUserUsingPost,
 } from '@/api/spaceUserController.ts'
 import dayjs from 'dayjs'
+import { anyType } from 'ant-design-vue/es/_util/type'
 
 interface Props {
   id: string

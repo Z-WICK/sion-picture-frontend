@@ -4,7 +4,7 @@
       <RouterLink to="/">
         <div class="title-bar">
           <img class="logo" src="../assets/logo.svg" alt="logo" />
-          <div class="title">Sion云图库</div>
+          <div class="title">灵感之源</div>
         </div>
       </RouterLink>
     </a-col>
