@@ -37,3 +37,58 @@ export function toHexColor(input: string) {
   // 返回标准 #RRGGBB 格式
   return `#${hexColor}`
 }
+
+/**
+ * 兼容代理与绝对地址的图片 URL
+ * @param url
+ */
+export const resolveImageUrl = (url?: string) => {
+  if (!url) {
+    return url
+  }
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
+
+  if (url.startsWith('/api/')) {
+    return url
+  }
+
+  if (url.startsWith('/uploads/')) {
+    const base = apiBaseUrl || 'http://localhost:8123'
+    try {
+      return new URL(url, base).toString()
+    } catch {
+      return url
+    }
+  }
+
+  const tryResolveSameOriginApi = (base?: string) => {
+    if (!base) {
+      return undefined
+    }
+    try {
+      const baseUrl = new URL(base, window.location.origin)
+      const targetUrl = new URL(url, window.location.origin)
+      if (targetUrl.origin === baseUrl.origin && targetUrl.pathname.startsWith('/api/')) {
+        return `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`
+      }
+    } catch {
+      return undefined
+    }
+    return undefined
+  }
+
+  const resolvedFromEnv = tryResolveSameOriginApi(apiBaseUrl)
+  if (resolvedFromEnv) {
+    return resolvedFromEnv
+  }
+
+  const localApiBase = 'http://localhost:8123'
+  const localApiHttpsBase = 'https://localhost:8123'
+  const resolvedFromLocal =
+    tryResolveSameOriginApi(localApiBase) || tryResolveSameOriginApi(localApiHttpsBase)
+  if (resolvedFromLocal) {
+    return resolvedFromLocal
+  }
+
+  return url
+}
