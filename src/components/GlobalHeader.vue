@@ -1,55 +1,58 @@
 <template>
-  <a-row :wrap="false">
-    <a-col flex="200px">
-      <RouterLink to="/">
-        <div class="title-bar">
-          <img class="logo" src="../assets/logo.svg" alt="logo" />
-          <div class="title">灵感之源</div>
-        </div>
-      </RouterLink>
-    </a-col>
+  <header id="globalHeader">
+    <a-row class="header-row" :wrap="false" align="middle">
+      <a-col flex="228px" class="brand-col">
+        <RouterLink to="/">
+          <div class="title-bar">
+            <img class="logo" src="../assets/logo.svg" alt="logo" />
+            <div class="title">灵感之源</div>
+          </div>
+        </RouterLink>
+      </a-col>
 
-    <a-col flex="auto">
-      <a-menu
-        v-model:selectedKeys="current"
-        mode="horizontal"
-        :items="items"
-        @click="doMenuClick"
-      />
-    </a-col>
+      <a-col flex="auto" class="menu-col">
+        <a-menu
+          class="nav-menu"
+          v-model:selectedKeys="current"
+          mode="horizontal"
+          :items="items"
+          @click="doMenuClick"
+        />
+      </a-col>
 
-    <a-col flex="120px">
-      <div class="user-login-status">
-        <div v-if="loginUserStore.loginUser.id">
-          <a-dropdown>
-            <ASpace>
-              <a-avatar :src="loginUserStore.loginUser.userAvatar" />
-              {{ loginUserStore.loginUser.userName ?? '无名' }}
-            </ASpace>
-            <template #overlay>
-              <a-menu>
-                <a-menu-item @click="goUserProfile">
-                  <UserOutlined />
-                  个人信息
-                </a-menu-item>
-                <a-menu-item @click="doLogout">
-                  <LogoutOutlined />
-                  退出登录
-                </a-menu-item>
-                <a-menu-item @click="goMySpace">
-                  <UserOutlined />
-                  我的空间
-                </a-menu-item>
-              </a-menu>
-            </template>
-          </a-dropdown>
+      <a-col flex="220px" class="user-col">
+        <div class="user-login-status">
+          <div v-if="loginUserStore.loginUser.id">
+            <a-dropdown>
+              <ASpace class="user-trigger">
+                <a-avatar :src="loginUserStore.loginUser.userAvatar" />
+                <span class="user-name">{{ loginUserStore.loginUser.userName ?? '无名' }}</span>
+              </ASpace>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item @click="goUserProfile">
+                    <UserOutlined />
+                    个人信息
+                  </a-menu-item>
+                  <a-menu-item @click="doLogout">
+                    <LogoutOutlined />
+                    退出登录
+                  </a-menu-item>
+                  <a-menu-item @click="goMySpace">
+                    <UserOutlined />
+                    我的空间
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
+          </div>
+          <div v-else>
+            <a-button class="login-btn" type="primary" href="/user/login">登录</a-button>
+          </div>
         </div>
-        <div v-else>
-          <a-button type="primary" href="/user/login">登录</a-button>
-        </div>
-      </div>
-    </a-col>
-  </a-row>
+      </a-col>
+    </a-row>
+  </header>
 </template>
 
 <script lang="ts" setup>
@@ -149,18 +152,191 @@ const items = computed<MenuProps['items']>(() => filterMenus(originItems))
 </script>
 
 <style scoped>
+#globalHeader {
+  --line: #d5dfeb;
+  --line-strong: #becde0;
+  --text-main: #1f2d3d;
+  --text-subtle: #5d6f86;
+  --brand: #355273;
+  --brand-hover: #294565;
+}
+
+.header-row {
+  min-height: 74px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #f9fbff 0%, #eef4fb 100%);
+  padding: 10px 14px;
+}
+
 .title-bar {
   display: flex;
   align-items: center;
+  min-height: 48px;
+  border-radius: 12px;
+  padding: 4px 8px 4px 4px;
+  transition: background-color 0.2s ease;
+}
+
+.title-bar:hover {
+  background: #edf3fb;
 }
 
 .title {
-  color: black;
+  color: var(--text-main);
   font-size: 18px;
-  margin-left: 16px;
+  font-weight: 600;
+  margin-left: 12px;
 }
 
 .logo {
-  height: 48px;
+  height: 42px;
+}
+
+.menu-col {
+  min-width: 0;
+}
+
+#globalHeader :deep(.nav-menu.ant-menu) {
+  background: transparent;
+  border-bottom: none;
+  line-height: 44px;
+}
+
+#globalHeader :deep(.nav-menu.ant-menu-horizontal::after) {
+  border-bottom: none;
+}
+
+#globalHeader :deep(.nav-menu .ant-menu-item) {
+  height: 44px;
+  line-height: 44px;
+  margin: 0 6px;
+  padding-inline: 14px;
+  border-radius: 10px;
+  color: var(--text-subtle);
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+#globalHeader :deep(.nav-menu .ant-menu-item::after) {
+  border-bottom: none !important;
+}
+
+#globalHeader :deep(.nav-menu .ant-menu-item:hover),
+#globalHeader :deep(.nav-menu .ant-menu-item-active) {
+  color: #2c496a;
+  background: #e7eef8;
+}
+
+#globalHeader :deep(.nav-menu .ant-menu-item-selected) {
+  color: #1e3851;
+  background: #dde8f4;
+  font-weight: 600;
+}
+
+.user-col {
+  min-width: 160px;
+}
+
+.user-login-status {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.user-trigger {
+  min-height: 44px;
+  max-width: 196px;
+  border-radius: 12px;
+  border: 1px solid var(--line-strong);
+  background: #f7faff;
+  color: var(--text-main);
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.user-trigger:hover {
+  border-color: #9db3cb;
+  background: #edf4fb;
+}
+
+.user-name {
+  max-width: 118px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.login-btn {
+  min-height: 44px;
+  border-radius: 12px;
+  padding-inline: 20px;
+  background: var(--brand);
+  border-color: var(--brand);
+  font-weight: 600;
+}
+
+.login-btn:hover,
+.login-btn:focus {
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+}
+
+@media (max-width: 900px) {
+  .header-row {
+    padding: 8px 10px;
+  }
+
+  .title {
+    font-size: 16px;
+    margin-left: 8px;
+  }
+
+  #globalHeader :deep(.nav-menu .ant-menu-item) {
+    margin: 0 4px;
+    padding-inline: 10px;
+  }
+
+  .user-trigger {
+    max-width: 160px;
+    padding-inline: 10px;
+  }
+
+  .user-name {
+    max-width: 86px;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    display: none;
+  }
+
+  .brand-col {
+    flex: 0 0 64px !important;
+    max-width: 64px;
+  }
+
+  .user-col {
+    flex: 0 0 124px !important;
+    max-width: 124px;
+  }
+
+  .user-trigger {
+    min-height: 40px;
+    border-radius: 10px;
+    padding-inline: 8px;
+  }
+
+  .login-btn {
+    min-height: 40px;
+    padding-inline: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #globalHeader :deep(*) {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 </style>

@@ -5,13 +5,21 @@
       width="200"
       breakpoint="lg"
       collapsed-width="0"
+      class="sider-shell"
     >
-      <a-menu
-        v-model:selectedKeys="current"
-        mode="inline"
-        :items="menuItems"
-        @click="doMenuClick"
-      />
+      <div class="sider-card">
+        <div class="sider-heading">
+          <p class="sider-eyebrow">Workspace</p>
+          <h3 class="sider-title">导航菜单</h3>
+        </div>
+        <a-menu
+          class="sider-menu"
+          v-model:selectedKeys="current"
+          mode="inline"
+          :items="menuItems"
+          @click="doMenuClick"
+        />
+      </div>
     </a-layout-sider>
   </div>
 </template>
@@ -53,7 +61,7 @@ const menuItems = computed(() => {
   }
   // 如果用户有团队空间，则展示固定菜单和团队空间菜单
   // 展示团队空间分组
-const teamSpaceSubMenus = teamSpaceList.value.map((spaceUser) => {
+  const teamSpaceSubMenus = teamSpaceList.value.map((spaceUser) => {
     const space = spaceUser.space
     return {
       key: '/space/' + spaceUser.spaceId,
@@ -104,7 +112,108 @@ const doMenuClick = ({ key }: { key: string }) => {
 </script>
 
 <style scoped>
-#globalSider .ant-layout-sider {
-  background: none;
+#globalSider {
+  padding-right: 8px;
+}
+
+#globalSider .sider-shell {
+  background: transparent !important;
+}
+
+#globalSider .sider-card {
+  margin: 6px 0 6px 6px;
+  border-radius: 16px;
+  border: 1px solid #d5dfeb;
+  background: linear-gradient(180deg, #f9fbfe 0%, #eef3f9 100%);
+  padding: 10px;
+}
+
+#globalSider .sider-heading {
+  padding: 8px 10px 6px;
+}
+
+#globalSider .sider-eyebrow {
+  margin: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #687a90;
+}
+
+#globalSider .sider-title {
+  margin: 3px 0 0;
+  font-size: 16px;
+  color: #23374d;
+}
+
+#globalSider :deep(.sider-menu.ant-menu) {
+  background: transparent;
+}
+
+#globalSider :deep(.sider-menu.ant-menu-inline) {
+  border-inline-end: none;
+}
+
+#globalSider :deep(.sider-menu .ant-menu-item),
+#globalSider :deep(.sider-menu .ant-menu-submenu-title) {
+  min-height: 44px;
+  line-height: 44px;
+  margin: 6px 0;
+  border-radius: 10px;
+  color: #495d74;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#globalSider :deep(.sider-menu .ant-menu-item .anticon),
+#globalSider :deep(.sider-menu .ant-menu-submenu-title .anticon) {
+  color: #60758d;
+}
+
+#globalSider :deep(.sider-menu .ant-menu-item:hover),
+#globalSider :deep(.sider-menu .ant-menu-submenu-title:hover),
+#globalSider :deep(.sider-menu .ant-menu-item-active) {
+  background: #e6edf6;
+  color: #2b4868;
+}
+
+#globalSider :deep(.sider-menu .ant-menu-item-selected) {
+  background: #dce8f4;
+  color: #1f3851;
+  font-weight: 600;
+}
+
+#globalSider :deep(.sider-menu .ant-menu-item-selected .anticon) {
+  color: #365778;
+}
+
+#globalSider :deep(.sider-menu .ant-menu-item-selected::after) {
+  border-inline-end: 3px solid #365778;
+}
+
+#globalSider :deep(.sider-menu .ant-menu-item-group-title) {
+  padding-inline: 12px;
+  margin-top: 10px;
+  margin-bottom: 2px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #72859b;
+}
+
+@media (max-width: 992px) {
+  #globalSider {
+    padding-right: 0;
+  }
+
+  #globalSider .sider-card {
+    margin: 4px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #globalSider :deep(*) {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 </style>
