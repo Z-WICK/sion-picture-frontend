@@ -1,5 +1,12 @@
 <template>
   <div id="spaceDetailPage">
+    <a-result
+      v-if="spaceNotFound"
+      status="404"
+      title="空间不存在"
+      sub-title="该空间可能已被删除或不存在，请返回我的空间重新选择。"
+    />
+    <template v-else>
     <!-- 空间信息 -->
     <a-flex justify="space-between">
       <h2>{{ space.spaceName }}（{{ SPACE_TYPE_MAP[space.spaceType] }}）</h2>
@@ -38,11 +45,7 @@
         <a-tooltip
           :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`"
         >
-          <a-progress
-            type="circle"
-            :size="42"
-            :percent="((space.totalSize * 100) / space.maxSize).toFixed(1)"
-          />
+          <a-progress type="circle" :size="42" :percent="spaceUsagePercent" />
         </a-tooltip>
       </a-space>
     </a-flex>
@@ -73,21 +76,22 @@
     />
     <BatchEditPictureModal
       ref="batchEditPictureModalRef"
-      :spaceId="id"
+      :spaceId="spaceId"
       :pictureList="dataList"
       :onSuccess="onBatchEditPictureSuccess"
     />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, h, onMounted, ref, watch } from 'vue'
-import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
+import { getSpaceGetVo } from '@/api/space'
 import { message } from 'ant-design-vue'
 import {
-  listPictureVoByPageUsingPost,
-  searchPictureByColorUsingPost,
-} from '@/api/pictureController.ts'
+  postPictureListPageVo,
+  postPictureSearchColor,
+} from '@/api/picture'
 import { formatSize } from '@/utils'
 import PictureList from '@/components/PictureList.vue'
 import PictureSearchForm from '@/components/PictureSearchForm.vue'
@@ -102,7 +106,24 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const spaceId = computed(() => {
+  const id = Number(props.id)
+  return Number.isNaN(id) ? undefined : id
+})
 const space = ref<API.SpaceVO>({})
+const spaceNotFound = ref(false)
+
+const getApiMessage = (error: unknown) => {
+  const maybeResponse = (error as { response?: { data?: { message?: string } } })?.response
+  return maybeResponse?.data?.message
+}
+const isNotFoundError = (error: unknown) => {
+  const maybeResponse = (error as { response?: { status?: number; data?: { code?: number } } })?.response
+  return maybeResponse?.status === 404 || maybeResponse?.data?.code === 40400
+}
+const getErrorMessage = (error: unknown) => {
+  return getApiMessage(error) ?? (error instanceof Error ? error.message : String(error))
+}
 
 // 通用权限检查函数
 function createPermissionChecker(permission: string) {
@@ -116,25 +137,58 @@ const canManageSpaceUser = createPermissionChecker(SPACE_PERMISSION_ENUM.SPACE_U
 const canUploadPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_UPLOAD)
 const canEditPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
 const canDeletePicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
+const spaceUsagePercent = computed(() => {
+  const totalSize = Number(space.value.totalSize ?? 0)
+  const maxSize = Number(space.value.maxSize ?? 0)
+  if (!Number.isFinite(totalSize) || !Number.isFinite(maxSize) || maxSize <= 0) {
+    return 0
+  }
+  const ratio = (totalSize * 100) / maxSize
+  return Number(Math.min(100, Math.max(0, ratio)).toFixed(1))
+})
 
 // -------- 获取空间详情 --------
 const fetchSpaceDetail = async () => {
   try {
-    const res = await getSpaceVoByIdUsingGet({
-      id: props.id,
+    if (!spaceId.value) {
+      spaceNotFound.value = false
+      return
+    }
+    const res = await getSpaceGetVo({
+      id: spaceId.value,
     })
     if (res.data.code === 0 && res.data.data) {
+      spaceNotFound.value = false
       space.value = res.data.data
+    } else if (res.data.code === 404 || res.data.code === 40400) {
+      spaceNotFound.value = true
+      space.value = {}
+      message.error(res.data.message ?? '空间不存在')
     } else {
+      spaceNotFound.value = false
+      space.value = {}
       message.error('获取空间详情失败，' + res.data.message)
     }
-  } catch (e: any) {
-    message.error('获取空间详情失败：' + e.message)
+  } catch (error) {
+    if (isNotFoundError(error)) {
+      spaceNotFound.value = true
+      space.value = {}
+      message.error(getApiMessage(error) ?? '空间不存在')
+      return
+    }
+    spaceNotFound.value = false
+    space.value = {}
+    message.error('获取空间详情失败：' + getErrorMessage(error))
   }
 }
 
+const initPageData = async () => {
+  await fetchSpaceDetail()
+  await fetchData()
+}
+
 onMounted(() => {
-  fetchSpaceDetail()
+  initPageData()
 })
 
 // --------- 获取图片列表 --------
@@ -155,25 +209,40 @@ const searchParams = ref<API.PictureQueryRequest>({
 // 获取数据
 const fetchData = async () => {
   loading.value = true
-  // 转换搜索参数
-  const params = {
-    spaceId: props.id,
-    ...searchParams.value,
+  if (!spaceId.value || spaceNotFound.value) {
+    loading.value = false
+    return
   }
-  const res = await listPictureVoByPageUsingPost(params)
-  if (res.data.code === 0 && res.data.data) {
-    dataList.value = res.data.data.records ?? []
-    total.value = res.data.data.total ?? 0
-  } else {
-    message.error('获取数据失败，' + res.data.message)
+  try {
+    // 转换搜索参数
+    const params = {
+      spaceId: spaceId.value,
+      ...searchParams.value,
+    }
+    const res = await postPictureListPageVo(params)
+    if (res.data.code === 0 && res.data.data) {
+      dataList.value = res.data.data.records ?? []
+      total.value = res.data.data.total ?? 0
+    } else if (res.data.code === 404 || res.data.code === 40400) {
+      spaceNotFound.value = true
+      dataList.value = []
+      total.value = 0
+      message.error(res.data.message ?? '空间不存在')
+    } else {
+      message.error('获取数据失败，' + res.data.message)
+    }
+  } catch (error) {
+    if (isNotFoundError(error)) {
+      spaceNotFound.value = true
+      dataList.value = []
+      total.value = 0
+      message.error(getApiMessage(error) ?? '空间不存在')
+    } else {
+      message.error('获取数据失败，' + getErrorMessage(error))
+    }
   }
   loading.value = false
 }
-
-// 页面加载时获取数据，请求一次
-onMounted(() => {
-  fetchData()
-})
 
 // 分页参数
 const onPageChange = (page: number, pageSize: number) => {
@@ -198,22 +267,42 @@ const onSearch = (newSearchParams: API.PictureQueryRequest) => {
 // 按照颜色搜索
 const onColorChange = async (color: string) => {
   loading.value = true
-  const res = await searchPictureByColorUsingPost({
-    picColor: color,
-    spaceId: props.id,
-  })
-  if (res.data.code === 0 && res.data.data) {
-    const data = res.data.data ?? []
-    dataList.value = data
-    total.value = data.length
-  } else {
-    message.error('获取数据失败，' + res.data.message)
+  if (!spaceId.value || spaceNotFound.value) {
+    loading.value = false
+    return
+  }
+  try {
+    const res = await postPictureSearchColor({
+      picColor: color,
+      spaceId: spaceId.value,
+    })
+    if (res.data.code === 0 && res.data.data) {
+      const data = res.data.data ?? []
+      dataList.value = data
+      total.value = data.length
+    } else if (res.data.code === 404 || res.data.code === 40400) {
+      spaceNotFound.value = true
+      dataList.value = []
+      total.value = 0
+      message.error(res.data.message ?? '空间不存在')
+    } else {
+      message.error('获取数据失败，' + res.data.message)
+    }
+  } catch (error) {
+    if (isNotFoundError(error)) {
+      spaceNotFound.value = true
+      dataList.value = []
+      total.value = 0
+      message.error(getApiMessage(error) ?? '空间不存在')
+    } else {
+      message.error('获取数据失败，' + getErrorMessage(error))
+    }
   }
   loading.value = false
 }
 
 // ---- 批量编辑图片 -----
-const batchEditPictureModalRef = ref()
+const batchEditPictureModalRef = ref<{ openModal: () => void } | null>(null)
 
 // 批量编辑图片成功
 const onBatchEditPictureSuccess = () => {
@@ -222,17 +311,14 @@ const onBatchEditPictureSuccess = () => {
 
 // 打开批量编辑图片弹窗
 const doBatchEdit = () => {
-  if (batchEditPictureModalRef.value) {
-    batchEditPictureModalRef.value.openModal()
-  }
+  batchEditPictureModalRef.value?.openModal()
 }
 
 // 空间 id 改变时，必须重新获取数据
 watch(
   () => props.id,
-  (newSpaceId) => {
-    fetchSpaceDetail()
-    fetchData()
+  async () => {
+    await initPageData()
   },
 )
 </script>

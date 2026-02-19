@@ -28,9 +28,9 @@
 
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import { userLoginUsingPost } from '@/api/userController.ts'
+import { postUser } from '@/api/user'
 import { message } from 'ant-design-vue'
 
 const formState = reactive<API.UserLoginRequest>({
@@ -39,24 +39,44 @@ const formState = reactive<API.UserLoginRequest>({
 })
 
 const router = useRouter()
+const route = useRoute()
 const loginUserStore = useLoginUserStore()
 
-const handleSubmit = async(values:any) => {
-  const res = await userLoginUsingPost(values)
-  // 登录成功，把登录状态保存到全局状态中
-  if(res.data.code === 0 && res.data.data) {
-    await loginUserStore.fetchLoginUser()
-    message.success("登录成功")
-    router.push({
-      path: '/',
-      replace:true,
-    })
-  }else {
-    message.error("登录失败"+res.data.message)
+const getSafeRedirectPath = () => {
+  const redirectParam = route.query.redirect
+  if (typeof redirectParam !== 'string' || !redirectParam) {
+    return '/'
+  }
+  const decodedRedirect = decodeURIComponent(redirectParam)
+  try {
+    const redirectUrl = new URL(decodedRedirect, window.location.origin)
+    if (redirectUrl.origin !== window.location.origin) {
+      return '/'
+    }
+    return `${redirectUrl.pathname}${redirectUrl.search}${redirectUrl.hash}` || '/'
+  } catch {
+    return decodedRedirect.startsWith('/') ? decodedRedirect : '/'
   }
 }
 
-
+const handleSubmit = async (values: API.UserLoginRequest) => {
+  const res = await postUser(values)
+  // 登录成功，把登录状态保存到全局状态中
+  if (res.data.code === 0 && res.data.data) {
+    await loginUserStore.fetchLoginUser()
+    message.success('登录成功')
+    const redirectPath = getSafeRedirectPath()
+    const loginUserRole = loginUserStore.loginUser.userRole
+    const targetPath =
+      redirectPath.startsWith('/admin') && loginUserRole !== 'admin' ? '/' : redirectPath
+    router.replace({
+      path: targetPath,
+      replace: true,
+    })
+  } else {
+    message.error('登录失败' + res.data.message)
+  }
+}
 </script>
 
 <style>
@@ -83,4 +103,3 @@ const handleSubmit = async(values:any) => {
   text-align: right;
 }
 </style>
-

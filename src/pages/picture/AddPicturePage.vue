@@ -27,7 +27,7 @@
       </a-space>
       <ImageCropper
         ref="imageCropperRef"
-        :imageUrl="picture?.url"
+        :imageUrl="resolveImageUrl(picture?.url)"
         :picture="picture"
         :spaceId="spaceId"
         :space="space"
@@ -85,19 +85,20 @@
 
 <script setup lang="ts">
 import PictureUpload from '@/components/PictureUpload.vue'
-import { computed, h, onMounted, reactive, ref, watchEffect } from 'vue'
+import { computed, h, onMounted, reactive, ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import {
-  editPictureUsingPost,
-  getPictureVoByIdUsingGet,
-  listPictureTagCategoryUsingGet,
-} from '@/api/pictureController.ts'
+  postPictureEdit,
+  getPictureGetVo,
+  getPictureTagCategory,
+} from '@/api/picture'
 import { useRoute, useRouter } from 'vue-router'
 import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
 import ImageCropper from '@/components/ImageCropper.vue'
 import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
 import ImageOutPainting from '@/components/ImageOutPainting.vue'
-import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
+import { getSpaceGetVo } from '@/api/space'
+import { resolveImageUrl } from '@/utils'
 
 const router = useRouter()
 const route = useRoute()
@@ -107,7 +108,8 @@ const pictureForm = reactive<API.PictureEditRequest>({})
 const uploadType = ref<'file' | 'url'>('file')
 // 空间 id
 const spaceId = computed(() => {
-  return route.query?.spaceId
+  const id = Number(route.query?.spaceId)
+  return Number.isNaN(id) ? undefined : id
 })
 
 /**
@@ -123,16 +125,15 @@ const onSuccess = (newPicture: API.PictureVO) => {
  * 提交表单
  * @param values
  */
-const handleSubmit = async (values: any) => {
-  console.log(values)
-  const pictureId = picture.value.id
+const handleSubmit = async () => {
+  const pictureId = picture.value?.id
   if (!pictureId) {
     return
   }
-  const res = await editPictureUsingPost({
+  const res = await postPictureEdit({
     id: pictureId,
     spaceId: spaceId.value,
-    ...values,
+    ...pictureForm,
   })
   // 操作成功
   if (res.data.code === 0 && res.data.data) {
@@ -146,15 +147,15 @@ const handleSubmit = async (values: any) => {
   }
 }
 
-const categoryOptions = ref<string[]>([])
-const tagOptions = ref<string[]>([])
+const categoryOptions = ref<{ value: string; label: string }[]>([])
+const tagOptions = ref<{ value: string; label: string }[]>([])
 
 /**
  * 获取标签和分类选项
  * @param values
  */
 const getTagCategoryOptions = async () => {
-  const res = await listPictureTagCategoryUsingGet()
+  const res = await getPictureTagCategory()
   if (res.data.code === 0 && res.data.data) {
     tagOptions.value = (res.data.data.tagList ?? []).map((data: string) => {
       return {
@@ -169,7 +170,7 @@ const getTagCategoryOptions = async () => {
       }
     })
   } else {
-    message.error('获取标签分类列表失败，' + res.data.message)
+    message.error(`获取标签分类列表失败，${res.data?.message ?? '请稍后重试'}`)
   }
 }
 
@@ -177,31 +178,64 @@ onMounted(() => {
   getTagCategoryOptions()
 })
 
+const resetPictureForm = () => {
+  pictureForm.name = undefined
+  pictureForm.introduction = undefined
+  pictureForm.category = undefined
+  pictureForm.tags = []
+}
+
+const resetCreateState = () => {
+  picture.value = undefined
+  uploadType.value = 'file'
+  resetPictureForm()
+}
+
+const fillPictureForm = (data: API.PictureVO) => {
+  pictureForm.name = data.name
+  pictureForm.introduction = data.introduction
+  pictureForm.category = data.category
+  pictureForm.tags = data.tags ?? []
+}
+
 // 获取老数据
-const getOldPicture = async () => {
-  // 获取到 id
-  const id = route.query?.id
-  if (id) {
-    const res = await getPictureVoByIdUsingGet({
+const loadPictureByRoute = async () => {
+  const id = Number(route.query?.id)
+  if (Number.isNaN(id)) {
+    resetCreateState()
+    return
+  }
+  try {
+    const res = await getPictureGetVo({
       id,
     })
     if (res.data.code === 0 && res.data.data) {
       const data = res.data.data
       picture.value = data
-      pictureForm.name = data.name
-      pictureForm.introduction = data.introduction
-      pictureForm.category = data.category
-      pictureForm.tags = data.tags
+      fillPictureForm(data)
+    } else {
+      resetCreateState()
+      message.error(`获取图片信息失败，${res.data.message}`)
     }
+  } catch (error) {
+    resetCreateState()
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    message.error(`获取图片信息失败，${errorMessage}`)
   }
 }
 
-onMounted(() => {
-  getOldPicture()
-})
+watch(
+  () => route.query?.id,
+  () => {
+    loadPictureByRoute()
+  },
+  {
+    immediate: true,
+  },
+)
 
 // ----- 图片编辑器引用 ------
-const imageCropperRef = ref()
+const imageCropperRef = ref<{ openModal: () => void } | null>(null)
 
 // 编辑图片
 const doEditPicture = async () => {
@@ -214,7 +248,7 @@ const onCropSuccess = (newPicture: API.PictureVO) => {
 }
 
 // ----- AI 扩图引用 -----
-const imageOutPaintingRef = ref()
+const imageOutPaintingRef = ref<{ openModal: () => void } | null>(null)
 
 // 打开 AI 扩图弹窗
 const doImagePainting = async () => {
@@ -228,22 +262,44 @@ const onImageOutPaintingSuccess = (newPicture: API.PictureVO) => {
 
 // 获取空间信息
 const space = ref<API.SpaceVO>()
+const getApiMessage = (error: unknown) => {
+  const maybeResponse = (error as { response?: { data?: { message?: string } } })?.response
+  return maybeResponse?.data?.message
+}
+const isNotFoundError = (error: unknown) => {
+  const maybeResponse = (error as { response?: { status?: number; data?: { code?: number } } })?.response
+  return maybeResponse?.status === 404 || maybeResponse?.data?.code === 40400
+}
 
 // 获取空间信息
 const fetchSpace = async () => {
-  // 获取数据
-  if (spaceId.value) {
-    const res = await getSpaceVoByIdUsingGet({
+  if (!spaceId.value) {
+    space.value = undefined
+    return
+  }
+  try {
+    // 获取数据
+    const res = await getSpaceGetVo({
       id: spaceId.value,
     })
     if (res.data.code === 0 && res.data.data) {
       space.value = res.data.data
+      return
     }
+    if (res.data.code === 404 || res.data.code === 40400) {
+      message.error(res.data.message ?? '空间不存在')
+      space.value = undefined
+      return
+    }
+    space.value = undefined
+  } catch (error) {
+    message.error(isNotFoundError(error) ? getApiMessage(error) ?? '空间不存在' : '获取空间信息失败')
+    space.value = undefined
   }
 }
 
-watchEffect(() => {
-  fetchSpace()
+watch(spaceId, fetchSpace, {
+  immediate: true,
 })
 </script>
 
