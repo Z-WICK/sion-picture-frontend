@@ -1,13 +1,12 @@
 # Contract: User Profile Edit (Frontend Usage)
 
 ## API Endpoint (from generated client)
-- Preferred generated function: `postUserUpdate(body: API.UserUpdateRequest)`
+- Preferred generated function: `postUserEdit(body: API.UserEditRequest)`
 - File: `src/api/user.ts`
 
 ## Request Body
 ```ts
 {
-  id: number,
   userName?: string,
   userAvatar?: string,
   userProfile?: string

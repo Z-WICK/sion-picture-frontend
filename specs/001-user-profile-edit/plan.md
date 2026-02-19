@@ -24,7 +24,7 @@
 - Composition API only: PASS（新增页面使用 `<script setup lang="ts">`）
 - Auto-generated API layer: PASS（仅调用 `src/api/user.ts` 生成方法）
 - Single UI library: PASS（使用 Ant Design Vue 表单组件）
-- Type safety: PASS（使用 `API.UserUpdateRequest`、`API.LoginUserVO` 类型）
+- Type safety: PASS（使用 `API.UserEditRequest`、`API.LoginUserVO` 类型）
 - Simplicity & YAGNI: PASS（不新增抽象层，不引入新依赖）
 
 ## Project Structure

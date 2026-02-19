@@ -13,11 +13,11 @@
 
 ## Cross-Module Call Chain (Planned)
 - Header Dropdown → Router(`/user/profile`) → UserProfilePage
-- UserProfilePage Submit → OpenAPI Client (`postUserUpdate`) → Backend
+- UserProfilePage Submit → OpenAPI Client (`postUserEdit`) → Backend
 - Submit Success → loginUserStore.fetchLoginUser → Header Re-render
 
 ## Schema / Data Compatibility
-- 前端仅使用已存在的 `API.UserUpdateRequest` 与 `API.LoginUserVO` 字段。
+- 前端仅使用已存在的 `API.UserEditRequest` 与 `API.LoginUserVO` 字段。
 - 无数据库迁移，无 schema 变更。
 
 ## SLA / Performance Risks

@@ -66,6 +66,6 @@
 
 ## Clarifications
 
-- Q: 提交用户信息编辑时应调用哪个接口？ -> A: 使用 OpenAPI 生成客户端中的用户更新接口（当前客户端为 `postUserUpdate`），并按生成类型传参。 | Source: UserInput(2026-02-19)
+- Q: 提交用户信息编辑时应调用哪个接口？ -> A: 使用 OpenAPI 生成客户端中的用户编辑接口（当前客户端为 `postUserEdit`），并按生成类型传参。 | Source: UserInput(2026-02-19)
 - Q: 编辑成功后是否需要刷新登录态？ -> A: 需要调用 `fetchLoginUser` 同步 Pinia 中的 `loginUser`，确保头部昵称和头像实时更新。 | Source: Spec-FR-004
 - Q: 个人信息编辑入口放在哪里？ -> A: 放在头部用户下拉菜单，新增“个人信息”入口并跳转到独立路由页面。 | Source: UX-Decision-Stage2

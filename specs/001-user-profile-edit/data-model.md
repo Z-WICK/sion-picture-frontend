@@ -11,10 +11,9 @@
   - `userProfile?: string`
   - `userRole?: string`
 
-### UserUpdateRequest
-- Source: `API.UserUpdateRequest`
+### UserEditRequest
+- Source: `API.UserEditRequest`
 - Key fields used:
-  - `id: number` (required in request body for current generated API)
   - `userName?: string`
   - `userAvatar?: string`
   - `userProfile?: string`
