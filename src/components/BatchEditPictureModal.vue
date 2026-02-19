@@ -1,6 +1,6 @@
 <template>
   <div class="batch-edit-picture-modal">
-    <a-modal v-model:visible="visible" title="批量编辑图片" :footer="false" @cancel="closeModal">
+    <a-modal v-model:open="visible" title="批量编辑图片" :footer="false" @cancel="closeModal">
       <a-typography-paragraph type="secondary">* 只对当前页面的图片生效</a-typography-paragraph>
       <!-- 批量创建表单 -->
       <a-form name="formData" layout="vertical" :model="formData" @finish="handleSubmit">
@@ -38,14 +38,14 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import {
-  editPictureByBatchUsingPost,
-  listPictureTagCategoryUsingGet,
-} from '@/api/pictureController.ts'
+  postPictureEditBatch,
+  getPictureTagCategory,
+} from '@/api/picture'
 import { message } from 'ant-design-vue'
 
 interface Props {
   pictureList: API.PictureVO[]
-  spaceId: number
+  spaceId?: number
   onSuccess: () => void
 }
 
@@ -79,11 +79,14 @@ const formData = reactive<API.PictureEditByBatchRequest>({
  * 提交表单
  * @param values
  */
-const handleSubmit = async (values: any) => {
+const handleSubmit = async (values: API.PictureEditByBatchRequest) => {
   if (!props.pictureList) {
     return
   }
-  const res = await editPictureByBatchUsingPost({
+  if (!props.spaceId) {
+    return
+  }
+  const res = await postPictureEditBatch({
     pictureIdList: props.pictureList.map((picture) => picture.id),
     spaceId: props.spaceId,
     ...values,
@@ -98,15 +101,15 @@ const handleSubmit = async (values: any) => {
   }
 }
 
-const categoryOptions = ref<string[]>([])
-const tagOptions = ref<string[]>([])
+const categoryOptions = ref<{ value: string; label: string }[]>([])
+const tagOptions = ref<{ value: string; label: string }[]>([])
 
 /**
  * 获取标签和分类选项
  * @param values
  */
 const getTagCategoryOptions = async () => {
-  const res = await listPictureTagCategoryUsingGet()
+  const res = await getPictureTagCategory()
   if (res.data.code === 0 && res.data.data) {
     tagOptions.value = (res.data.data.tagList ?? []).map((data: string) => {
       return {
@@ -121,7 +124,7 @@ const getTagCategoryOptions = async () => {
       }
     })
   } else {
-    message.error('获取标签分类列表失败，' + res.data.message)
+    message.error(`获取标签分类列表失败，${res.data?.message ?? '请稍后重试'}`)
   }
 }
 

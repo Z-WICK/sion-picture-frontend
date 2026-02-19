@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getLoginUserUsingGet } from '@/api/userController.ts'
+import { getUserGetLogin } from '@/api/user'
 
 export const useLoginUserStore = defineStore('loginUser', () => {
   const loginUser = ref<API.LoginUserVO>({
@@ -8,13 +8,13 @@ export const useLoginUserStore = defineStore('loginUser', () => {
   })
 
   async function fetchLoginUser() {
-    const res = await getLoginUserUsingGet()
+    const res = await getUserGetLogin()
     if (res.data.code === 0 && res.data.data) {
       loginUser.value = res.data.data
     }
   }
 
-  function setLoginUser(newLoginUser: any) {
+  function setLoginUser(newLoginUser: API.LoginUserVO) {
     loginUser.value = newLoginUser
   }
 

@@ -43,11 +43,7 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
-import {
-  listPictureByPageWithCacheUsingPost,
-  listPictureTagCategoryUsingGet,
-  listPictureVoByPageUsingPost
-} from '@/api/pictureController.ts'
+import { getPictureTagCategory, postPictureListPageVo } from '@/api/picture'
 import { message } from 'ant-design-vue'
 import PictureList from '@/components/PictureList.vue' // 定义数据
 
@@ -82,7 +78,7 @@ const fetchData = async () => {
       params.tags.push(tagList.value[index])
     }
   })
-  const res = await listPictureVoByPageUsingPost(params)
+  const res = await postPictureListPageVo(params)
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0
@@ -122,12 +118,12 @@ const selectedTagList = ref<boolean[]>([])
  * @param values
  */
 const getTagCategoryOptions = async () => {
-  const res = await listPictureTagCategoryUsingGet()
+  const res = await getPictureTagCategory()
   if (res.data.code === 0 && res.data.data) {
     tagList.value = res.data.data.tagList ?? []
     categoryList.value = res.data.data.categoryList ?? []
   } else {
-    message.error('获取标签分类列表失败，' + res.data.message)
+    message.error(`获取标签分类列表失败，${res.data?.message ?? '请稍后重试'}`)
   }
 }
 

@@ -10,7 +10,7 @@
 import VChart from 'vue-echarts'
 import 'echarts'
 import { computed, ref, watchEffect } from 'vue'
-import { getSpaceRankAnalyzeUsingPost } from '@/api/spaceAnalyzeController.ts'
+import { postSpaceAnalyzeRank } from '@/api/analyze'
 import { message } from 'ant-design-vue'
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
   spaceId?: number
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   queryAll: false,
   queryPublic: false,
 })
@@ -33,10 +33,7 @@ const loading = ref(true)
 const fetchData = async () => {
   loading.value = true
   // 转换搜索参数
-  const res = await getSpaceRankAnalyzeUsingPost({
-    queryAll: props.queryAll,
-    queryPublic: props.queryPublic,
-    spaceId: props.spaceId,
+  const res = await postSpaceAnalyzeRank({
     topN: 10, // 后端默认是 10
   })
   if (res.data.code === 0 && res.data.data) {

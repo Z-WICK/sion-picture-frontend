@@ -21,7 +21,7 @@ import { PictureOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons-v
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { SPACE_TYPE_ENUM } from '@/constants/space.ts'
-import { listMyTeamSpaceUsingPost } from '@/api/spaceUserController.ts'
+import { postSpaceUserListMy } from '@/api/spaceUser'
 import { message } from 'ant-design-vue'
 
 const loginUserStore = useLoginUserStore()
@@ -53,7 +53,7 @@ const menuItems = computed(() => {
   }
   // 如果用户有团队空间，则展示固定菜单和团队空间菜单
   // 展示团队空间分组
-  const teamSpaceSubMenus = teamSpaceList.value.map((spaceUser) => {
+const teamSpaceSubMenus = teamSpaceList.value.map((spaceUser) => {
     const space = spaceUser.space
     return {
       key: '/space/' + spaceUser.spaceId,
@@ -71,7 +71,7 @@ const menuItems = computed(() => {
 
 // 加载团队空间列表
 const fetchTeamSpaceList = async () => {
-  const res = await listMyTeamSpaceUsingPost()
+  const res = await postSpaceUserListMy()
   if (res.data.code === 0 && res.data.data) {
     teamSpaceList.value = res.data.data
   } else {
@@ -93,12 +93,12 @@ const router = useRouter()
 // 当前要高亮的菜单项
 const current = ref<string[]>([])
 // 监听路由变化，更新高亮菜单项
-router.afterEach((to, from, next) => {
+router.afterEach((to) => {
   current.value = [to.path]
 })
 
 // 路由跳转事件
-const doMenuClick = ({ key }) => {
+const doMenuClick = ({ key }: { key: string }) => {
   router.push(key)
 }
 </script>

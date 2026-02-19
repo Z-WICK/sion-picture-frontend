@@ -1,7 +1,7 @@
 <template>
   <a-modal
     class="image-cropper"
-    v-model:visible="visible"
+    v-model:open="visible"
     title="编辑图片"
     :footer="false"
     @cancel="closeModal"
@@ -44,7 +44,7 @@
 
 <script lang="ts" setup>
 import { computed, onUnmounted, ref, watchEffect } from 'vue'
-import { uploadPictureUsingPost } from '@/api/pictureController.ts'
+import { postPictureUpload } from '@/api/picture'
 import { message } from 'ant-design-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import PictureEditWebSocket from '@/utils/pictureEditWebSocket.ts'
@@ -66,11 +66,18 @@ const isTeamSpace = computed(() => {
   return props.space?.spaceType === SPACE_TYPE_ENUM.TEAM
 })
 
+type CropperInstance = {
+  changeScale: (num: number) => void
+  rotateLeft: () => void
+  rotateRight: () => void
+  getCropBlob: (callback: (blob: Blob) => void) => void
+}
+
 // 获取图片裁切器的引用
-const cropperRef = ref()
+const cropperRef = ref<CropperInstance | null>(null)
 
 // 缩放比例
-const changeScale = (num) => {
+const changeScale = (num: number) => {
   cropperRef.value?.changeScale(num)
   if (num > 0) {
     editAction(PICTURE_EDIT_ACTION_ENUM.ZOOM_IN)
@@ -81,19 +88,19 @@ const changeScale = (num) => {
 
 // 向左旋转
 const rotateLeft = () => {
-  cropperRef.value.rotateLeft()
+  cropperRef.value?.rotateLeft()
   editAction(PICTURE_EDIT_ACTION_ENUM.ROTATE_LEFT)
 }
 
 // 向右旋转
 const rotateRight = () => {
-  cropperRef.value.rotateRight()
+  cropperRef.value?.rotateRight()
   editAction(PICTURE_EDIT_ACTION_ENUM.ROTATE_RIGHT)
 }
 
 // 确认裁切
 const handleConfirm = () => {
-  cropperRef.value.getCropBlob((blob: Blob) => {
+  cropperRef.value?.getCropBlob((blob: Blob) => {
     // blob 为已经裁切好的文件
     const fileName = (props.picture?.name || 'image') + '.png'
     const file = new File([blob], fileName, { type: blob.type })
@@ -108,12 +115,12 @@ const loading = ref(false)
  * 上传图片
  * @param file
  */
-const handleUpload = async ({ file }: any) => {
+const handleUpload = async ({ file }: { file: File }) => {
   loading.value = true
   try {
     const params: API.PictureUploadRequest = props.picture ? { id: props.picture.id } : {}
     params.spaceId = props.spaceId
-    const res = await uploadPictureUsingPost(params, {}, file)
+    const res = await postPictureUpload(params, file)
     if (res.data.code === 0 && res.data.data) {
       message.success('图片上传成功')
       // 将上传成功的图片信息传递给父组件
@@ -123,8 +130,9 @@ const handleUpload = async ({ file }: any) => {
       message.error('图片上传失败，' + res.data.message)
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
     console.error('图片上传失败', error)
-    message.error('图片上传失败，' + error.message)
+    message.error('图片上传失败，' + errorMessage)
   }
   loading.value = false
 }
@@ -196,26 +204,38 @@ const initWebsocket = () => {
 
   // 监听一系列的事件
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.INFO, (msg) => {
-    console.log('收到通知消息：', msg)
-    message.info(msg.message)
+    const payload = msg as { message?: string }
+    console.log('收到通知消息：', payload)
+    if (payload.message) {
+      message.info(payload.message)
+    }
   })
 
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.ERROR, (msg) => {
-    console.log('收到错误通知：', msg)
-    message.info(msg.message)
+    const payload = msg as { message?: string }
+    console.log('收到错误通知：', payload)
+    if (payload.message) {
+      message.info(payload.message)
+    }
   })
 
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.ENTER_EDIT, (msg) => {
-    console.log('收到进入编辑状态的消息：', msg)
-    message.info(msg.message)
-    editingUser.value = msg.user
+    const payload = msg as { message?: string; user?: API.UserVO }
+    console.log('收到进入编辑状态的消息：', payload)
+    if (payload.message) {
+      message.info(payload.message)
+    }
+    editingUser.value = payload.user
   })
 
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EDIT_ACTION, (msg) => {
-    console.log('收到编辑操作的消息：', msg)
-    message.info(msg.message)
+    const payload = msg as { message?: string; editAction?: string }
+    console.log('收到编辑操作的消息：', payload)
+    if (payload.message) {
+      message.info(payload.message)
+    }
     // 根据收到的编辑操作，执行相应的操作
-    switch (msg.editAction) {
+    switch (payload.editAction) {
       case PICTURE_EDIT_ACTION_ENUM.ROTATE_LEFT:
         rotateLeft()
         break
@@ -232,8 +252,11 @@ const initWebsocket = () => {
   })
 
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_EDIT, (msg) => {
-    console.log('收到退出编辑状态的消息：', msg)
-    message.info(msg.message)
+    const payload = msg as { message?: string }
+    console.log('收到退出编辑状态的消息：', payload)
+    if (payload.message) {
+      message.info(payload.message)
+    }
     editingUser.value = undefined
   })
 }

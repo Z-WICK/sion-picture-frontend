@@ -6,7 +6,7 @@
       <template #cover>
         <img
           :alt="picture.name"
-          :src="picture.thumbnailUrl ?? picture.url"
+          :src="resolveImageUrl(picture.thumbnailUrl ?? picture.url)"
           style="height: 180px; object-fit: cover"
         />
       </template>
@@ -41,23 +41,28 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import {
-  getPictureVoByIdUsingGet,
-  searchPictureByPictureUsingPost,
-} from '@/api/pictureController.ts'
+  getPictureGetVo,
+  postPictureSearchPicture,
+} from '@/api/picture'
 import { message } from 'ant-design-vue'
 import { useRoute } from 'vue-router'
+import { resolveImageUrl } from '@/utils'
 
 const route = useRoute()
 
 const pictureId = computed(() => {
-  return route.query?.pictureId
+  const id = Number(route.query?.pictureId)
+  return Number.isNaN(id) ? undefined : id
 })
 const picture = ref<API.PictureVO>({})
 
 // 获取图片详情
 const fetchPictureDetail = async () => {
   try {
-    const res = await getPictureVoByIdUsingGet({
+    if (!pictureId.value) {
+      return
+    }
+    const res = await getPictureGetVo({
       id: pictureId.value,
     })
     if (res.data.code === 0 && res.data.data) {
@@ -65,8 +70,9 @@ const fetchPictureDetail = async () => {
     } else {
       message.error('获取图片详情失败，' + res.data.message)
     }
-  } catch (e: any) {
-    message.error('获取图片详情失败：' + e.message)
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    message.error('获取图片详情失败：' + errorMessage)
   }
 }
 
@@ -81,7 +87,10 @@ const loading = ref<boolean>(true)
 const fetchResultData = async () => {
   loading.value = true
   try {
-    const res = await searchPictureByPictureUsingPost({
+    if (!pictureId.value) {
+      return
+    }
+    const res = await postPictureSearchPicture({
       pictureId: pictureId.value,
     })
     if (res.data.code === 0 && res.data.data) {
@@ -89,8 +98,9 @@ const fetchResultData = async () => {
     } else {
       message.error('获取数据失败，' + res.data.message)
     }
-  } catch (e: any) {
-    message.error('获取数据失败，' + e.message)
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    message.error('获取数据失败，' + errorMessage)
   }
   loading.value = false
 }

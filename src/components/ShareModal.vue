@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-modal v-model:visible="visible" :title="title" :footer="false" @cancel="closeModal">
+    <a-modal v-model:open="visible" :title="title" :footer="false" @cancel="closeModal">
       <h4>复制分享链接</h4>
       <a-typography-link copyable>
         {{ link }}
@@ -12,17 +12,19 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, toRefs } from 'vue'
 
 interface Props {
-  title: string
-  link: string
+  title?: string
+  link?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: '分享图片',
   link: 'https://www.codefather.cn',
 })
+
+const { title, link } = toRefs(props)
 
 // 是否可见
 const visible = ref(false)

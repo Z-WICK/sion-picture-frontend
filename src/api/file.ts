@@ -1,14 +1,13 @@
-// @ts-ignore
 /* eslint-disable */
 import request from '@/request'
 
-/** testDownloadFile GET /api/file/test/download/ */
-export async function testDownloadFileUsingGet(
+/** Download test file (admin) GET /file/test/download/ */
+export async function getFileTestDownload(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.testDownloadFileUsingGETParams,
+  params: API.getFileTestDownloadParams,
   options?: { [key: string]: any }
 ) {
-  return request<any>('/api/file/test/download/', {
+  return request<string>('/file/test/download/', {
     method: 'GET',
     params: {
       ...params,
@@ -17,13 +16,13 @@ export async function testDownloadFileUsingGet(
   })
 }
 
-/** testDownloadFileR2 GET /api/file/test/r2/download */
-export async function testDownloadFileR2UsingGet(
+/** Download R2 test file (admin) GET /file/test/r2/download */
+export async function getFileTestR2Download(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.testDownloadFileR2UsingGETParams,
+  params: API.getFileTestR2DownloadParams,
   options?: { [key: string]: any }
 ) {
-  return request<any>('/api/file/test/r2/download', {
+  return request<string>('/file/test/r2/download', {
     method: 'GET',
     params: {
       ...params,
@@ -32,8 +31,8 @@ export async function testDownloadFileR2UsingGet(
   })
 }
 
-/** testUploadFileR2 POST /api/file/test/r2/upload */
-export async function testUploadFileR2UsingPost(
+/** Upload test file to R2 (admin) POST /file/test/r2/upload */
+export async function postFileTestR2Upload(
   body: {},
   file?: File,
   options?: { [key: string]: any }
@@ -60,20 +59,15 @@ export async function testUploadFileR2UsingPost(
     }
   })
 
-  return request<API.BaseResponseString_>('/api/file/test/r2/upload', {
+  return request<API.BaseResponse>('/file/test/r2/upload', {
     method: 'POST',
     data: formData,
-    requestType: 'form',
     ...(options || {}),
   })
 }
 
-/** testUploadFile POST /api/file/test/upload */
-export async function testUploadFileUsingPost(
-  body: {},
-  file?: File,
-  options?: { [key: string]: any }
-) {
+/** Upload test file (admin) POST /file/test/upload */
+export async function postFileTestUpload(body: {}, file?: File, options?: { [key: string]: any }) {
   const formData = new FormData()
 
   if (file) {
@@ -96,10 +90,9 @@ export async function testUploadFileUsingPost(
     }
   })
 
-  return request<API.BaseResponseString_>('/api/file/test/upload', {
+  return request<API.BaseResponse>('/file/test/upload', {
     method: 'POST',
     data: formData,
-    requestType: 'form',
     ...(options || {}),
   })
 }

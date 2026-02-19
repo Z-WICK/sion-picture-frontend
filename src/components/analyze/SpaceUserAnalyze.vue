@@ -16,7 +16,7 @@
 import VChart from 'vue-echarts'
 import 'echarts'
 import { computed, ref, watchEffect } from 'vue'
-import { getSpaceUserAnalyzeUsingPost } from '@/api/spaceAnalyzeController.ts'
+import { postSpaceAnalyzeUser } from '@/api/analyze'
 import { message } from 'ant-design-vue'
 
 interface Props {
@@ -48,9 +48,10 @@ const timeDimensionOptions = [
   },
 ]
 // 用户选项
-const userId = ref<string>()
+const userId = ref<number>()
 const doSearch = (value: string) => {
-  userId.value = value
+  const parsed = Number(value)
+  userId.value = Number.isNaN(parsed) ? undefined : parsed
 }
 
 // 图表数据
@@ -62,7 +63,7 @@ const loading = ref(true)
 const fetchData = async () => {
   loading.value = true
   // 转换搜索参数
-  const res = await getSpaceUserAnalyzeUsingPost({
+  const res = await postSpaceAnalyzeUser({
     queryAll: props.queryAll,
     queryPublic: props.queryPublic,
     spaceId: props.spaceId,

@@ -1,20 +1,19 @@
-// @ts-ignore
-/* eslint-disable */
+
 // API 更新时间：
 // API 唯一标识：
-import * as fileController from './fileController'
-import * as mainController from './mainController'
-import * as pictureController from './pictureController'
-import * as spaceController from './spaceController'
-import * as spaceAnalyzeController from './spaceAnalyzeController'
-import * as spaceUserController from './spaceUserController'
-import * as userController from './userController'
+import * as file from './file'
+import * as health from './health'
+import * as picture from './picture'
+import * as space from './space'
+import * as analyze from './analyze'
+import * as spaceUser from './spaceUser'
+import * as user from './user'
 export default {
-  fileController,
-  mainController,
-  pictureController,
-  spaceController,
-  spaceAnalyzeController,
-  spaceUserController,
-  userController,
+  file,
+  health,
+  picture,
+  space,
+  analyze,
+  spaceUser,
+  user,
 }

@@ -3,7 +3,7 @@ import { message } from 'ant-design-vue'
 
 // 创建 Axios 实例
 const myAxios = axios.create({
-  baseURL: 'http://localhost:8123',
+  baseURL: '/api',
   timeout: 60000,
   withCredentials: true,
 })
@@ -38,8 +38,16 @@ myAxios.interceptors.response.use(
     return response
   },
   function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
+    if (error.response?.status === 401) {
+      if (
+        !error.config?.url?.includes('user/get/login') &&
+        !window.location.pathname.includes('/user/login')
+      ) {
+        message.warning('请先登录')
+        window.location.href = `/user/login?redirect=${window.location.href}`
+      }
+      return Promise.resolve(error.response)
+    }
     return Promise.reject(error)
   },
 )

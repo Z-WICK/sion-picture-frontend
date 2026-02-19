@@ -1,13 +1,12 @@
-// @ts-ignore
 /* eslint-disable */
 import request from '@/request'
 
-/** addSpaceUser POST /api/spaceUser/add */
-export async function addSpaceUserUsingPost(
+/** Add space member POST /spaceUser/add */
+export async function postSpaceUserAdd(
   body: API.SpaceUserAddRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseLong_>('/api/spaceUser/add', {
+  return request<API.BaseResponse>('/spaceUser/add', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -17,12 +16,12 @@ export async function addSpaceUserUsingPost(
   })
 }
 
-/** deleteSpaceUser POST /api/spaceUser/delete */
-export async function deleteSpaceUserUsingPost(
+/** Delete space member POST /spaceUser/delete */
+export async function postSpaceUserOpenApiDelete(
   body: API.DeleteRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseBoolean_>('/api/spaceUser/delete', {
+  return request<API.BaseResponse>('/spaceUser/delete', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -32,12 +31,12 @@ export async function deleteSpaceUserUsingPost(
   })
 }
 
-/** editSpaceUser POST /api/spaceUser/edit */
-export async function editSpaceUserUsingPost(
+/** Edit space member POST /spaceUser/edit */
+export async function postSpaceUserEdit(
   body: API.SpaceUserEditRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseBoolean_>('/api/spaceUser/edit', {
+  return request<API.BaseResponse>('/spaceUser/edit', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -47,12 +46,12 @@ export async function editSpaceUserUsingPost(
   })
 }
 
-/** getSpaceUser POST /api/spaceUser/get */
-export async function getSpaceUserUsingPost(
+/** Get space member POST /spaceUser/get */
+export async function postSpaceUserGet(
   body: API.SpaceUserQueryRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseSpaceUser_>('/api/spaceUser/get', {
+  return request<API.BaseResponse>('/spaceUser/get', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -62,12 +61,12 @@ export async function getSpaceUserUsingPost(
   })
 }
 
-/** listSpaceUser POST /api/spaceUser/list */
-export async function listSpaceUserUsingPost(
+/** List space members POST /spaceUser/list */
+export async function postSpaceUserList(
   body: API.SpaceUserQueryRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseListSpaceUserVO_>('/api/spaceUser/list', {
+  return request<API.BaseResponse>('/spaceUser/list', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -77,9 +76,9 @@ export async function listSpaceUserUsingPost(
   })
 }
 
-/** listMyTeamSpace POST /api/spaceUser/list/my */
-export async function listMyTeamSpaceUsingPost(options?: { [key: string]: any }) {
-  return request<API.BaseResponseListSpaceUserVO_>('/api/spaceUser/list/my', {
+/** List my spaces POST /spaceUser/list/my */
+export async function postSpaceUserListMy(options?: { [key: string]: any }) {
+  return request<API.BaseResponse>('/spaceUser/list/my', {
     method: 'POST',
     ...(options || {}),
   })

@@ -34,32 +34,31 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { uploadPictureByBatchUsingPost } from '@/api/pictureController.ts'
+import { postPictureUploadBatch } from '@/api/picture'
 import { message } from 'ant-design-vue'
 import router from '@/router'
 
 const formData = reactive<API.PictureUploadByBatchRequest>({
-  count:10,
+  count: 10,
 })
 
 const loading = ref(false)
 
-const handleSubmit = async(values:any) =>{
-  loading.value = true;
-  const res = await uploadPictureByBatchUsingPost({
+const handleSubmit = async () => {
+  loading.value = true
+  const res = await postPictureUploadBatch({
     ...formData,
   })
-  if(res.data.code === 0 && res.data.data){
-    message.success("创建成功，共${res.data.data}条")
+  if (res.data.code === 0 && res.data.data) {
+    message.success(`创建成功，共${res.data.data}条`)
     router.push({
-      path:"/",
+      path: '/',
     })
-  }else {
-    message.error("创建失败"+res.data.message)
+  } else {
+    message.error('创建失败' + res.data.message)
   }
-  loading.value = false;
+  loading.value = false
 }
-
 </script>
 
 <style scoped>

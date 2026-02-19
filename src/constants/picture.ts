@@ -4,7 +4,7 @@ export const PIC_REVIEW_STATUS_ENUM = {
   REJECT: 2,
 }
 
-export const PIC_REVIEW_STATUS_MAP = {
+export const PIC_REVIEW_STATUS_MAP: Record<number, string> = {
   0: '待审核',
   1: '通过',
   2: '拒绝',
@@ -12,8 +12,8 @@ export const PIC_REVIEW_STATUS_MAP = {
 
 export const PIC_REVIEW_STATUS_OPTIONS = Object.keys(PIC_REVIEW_STATUS_MAP).map((key) => {
   return {
-    label: PIC_REVIEW_STATUS_MAP[key],
-    value: key,
+    label: PIC_REVIEW_STATUS_MAP[Number(key)],
+    value: Number(key),
   }
 })
 
@@ -26,7 +26,7 @@ export const PICTURE_EDIT_MESSAGE_TYPE_ENUM = {
   ENTER_EDIT: 'ENTER_EDIT',
   EXIT_EDIT: 'EXIT_EDIT',
   EDIT_ACTION: 'EDIT_ACTION',
-};
+}
 
 /**
  * 图片编辑消息类型映射
@@ -37,7 +37,7 @@ export const PICTURE_EDIT_MESSAGE_TYPE_MAP = {
   ENTER_EDIT: '进入编辑状态',
   EXIT_EDIT: '退出编辑状态',
   EDIT_ACTION: '执行编辑操作',
-};
+}
 
 /**
  * 图片编辑操作枚举
@@ -47,7 +47,7 @@ export const PICTURE_EDIT_ACTION_ENUM = {
   ZOOM_OUT: 'ZOOM_OUT',
   ROTATE_LEFT: 'ROTATE_LEFT',
   ROTATE_RIGHT: 'ROTATE_RIGHT',
-};
+}
 
 /**
  * 图片编辑操作映射
@@ -57,5 +57,5 @@ export const PICTURE_EDIT_ACTION_MAP = {
   ZOOM_OUT: '缩小操作',
   ROTATE_LEFT: '左旋操作',
   ROTATE_RIGHT: '右旋操作',
-};
+}
 

@@ -29,7 +29,7 @@
         * 目前仅支持开通普通版，如需升级空间，请联系
         <a href="" target="_blank">JohnSion</a>
       </a-typography-paragraph>
-      <a-typography-paragraph v-for="spaceLevel in spaceLevelList">
+      <a-typography-paragraph v-for="spaceLevel in spaceLevelList" :key="spaceLevel.id">
         {{ spaceLevel.text }}：大小 {{ formatSize(spaceLevel.maxSize) }}，数量
         {{ spaceLevel.maxCount }}
       </a-typography-paragraph>
@@ -41,17 +41,18 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import {
-  addSpaceUsingPost,
-  getSpaceVoByIdUsingGet,
-  listSpaceLevelUsingGet,
-  updateSpaceUsingPost,
-} from '@/api/spaceController.ts'
+  postSpaceAdd,
+  getSpaceGetVo,
+  getSpaceListLevel,
+  postSpaceUpdate,
+} from '@/api/space'
 import { useRoute, useRouter } from 'vue-router'
-import {SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS, SPACE_TYPE_ENUM, SPACE_TYPE_MAP} from '@/constants/space.ts'
+import { SPACE_LEVEL_OPTIONS, SPACE_TYPE_ENUM, SPACE_TYPE_MAP } from '@/constants/space.ts'
 import { formatSize } from '@/utils'
 
 const space = ref<API.SpaceVO>()
-const spaceForm = reactive<API.SpaceAddRequest | API.SpaceEditRequest>({})
+type SpaceFormState = API.SpaceAddRequest & API.SpaceUpdateRequest
+const spaceForm = reactive<SpaceFormState>({})
 const loading = ref(false)
 
 const route = useRoute()
@@ -68,7 +69,7 @@ const spaceLevelList = ref<API.SpaceLevel[]>([])
 
 // 获取空间级别
 const fetchSpaceLevelList = async () => {
-  const res = await listSpaceLevelUsingGet()
+  const res = await getSpaceListLevel()
   if (res.data.code === 0 && res.data.data) {
     spaceLevelList.value = res.data.data
   } else {
@@ -86,19 +87,19 @@ const router = useRouter()
  * 提交表单
  * @param values
  */
-const handleSubmit = async (values: any) => {
+const handleSubmit = async () => {
   const spaceId = space.value?.id
   loading.value = true
   let res
   if (spaceId) {
     // 更新
-    res = await updateSpaceUsingPost({
+    res = await postSpaceUpdate({
       id: spaceId,
       ...spaceForm,
     })
   } else {
     // 创建
-    res = await addSpaceUsingPost({
+    res = await postSpaceAdd({
       ...spaceForm,
       spaceType: spaceType.value,
     })
@@ -119,9 +120,9 @@ const handleSubmit = async (values: any) => {
 // 获取老数据
 const getOldSpace = async () => {
   // 获取到 id
-  const id = route.query?.id
-  if (id) {
-    const res = await getSpaceVoByIdUsingGet({
+  const id = Number(route.query?.id)
+  if (!Number.isNaN(id)) {
+    const res = await getSpaceGetVo({
       id,
     })
     if (res.data.code === 0 && res.data.data) {

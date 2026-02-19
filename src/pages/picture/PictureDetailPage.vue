@@ -4,7 +4,7 @@
       <!-- 图片预览 -->
       <a-col :sm="24" :md="16" :xl="18">
         <a-card title="图片预览">
-          <a-image :src="picture.url" style="max-height: 600px; object-fit: contain" />
+          <a-image :src="pictureUrl" style="max-height: 600px; object-fit: contain" />
         </a-card>
       </a-col>
       <!-- 图片信息区域 -->
@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import { computed, h, onMounted, ref } from 'vue'
-import { deletePictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController.ts'
+import { postPictureOpenApiDelete, getPictureGetVo } from '@/api/picture'
 import { message } from 'ant-design-vue'
 import {
   DeleteOutlined,
@@ -97,7 +97,7 @@ import {
 } from '@ant-design/icons-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { useRouter } from 'vue-router'
-import { downloadImage, formatSize, toHexColor } from '@/utils'
+import { downloadImage, formatSize, resolveImageUrl, toHexColor } from '@/utils'
 import ShareModal from '@/components/ShareModal.vue'
 
 interface Props {
@@ -105,7 +105,12 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const pictureId = computed(() => {
+  const id = Number(props.id)
+  return Number.isNaN(id) ? undefined : id
+})
 const picture = ref<API.PictureVO>({})
+const pictureUrl = computed(() => resolveImageUrl(picture.value.url))
 
 const loginUserStore = useLoginUserStore()
 
@@ -124,16 +129,20 @@ const canEdit = computed(() => {
 // 获取图片详情
 const fetchPictureDetail = async () => {
   try {
-    const res = await getPictureVoByIdUsingGet({
-      id: props.id,
+    if (!pictureId.value) {
+      return
+    }
+    const res = await getPictureGetVo({
+      id: pictureId.value,
     })
     if (res.data.code === 0 && res.data.data) {
       picture.value = res.data.data
     } else {
       message.error('获取图片详情失败，' + res.data.message)
     }
-  } catch (e: any) {
-    message.error('获取图片详情失败：' + e.message)
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    message.error('获取图片详情失败：' + errorMessage)
   }
 }
 
@@ -160,7 +169,7 @@ const doDelete = async () => {
   if (!id) {
     return
   }
-  const res = await deletePictureUsingPost({ id })
+  const res = await postPictureOpenApiDelete({ id })
   if (res.data.code === 0) {
     message.success('删除成功')
   } else {
@@ -170,19 +179,17 @@ const doDelete = async () => {
 
 // 下载图片
 const doDownload = () => {
-  downloadImage(picture.value.url)
+  downloadImage(pictureUrl.value)
 }
 
 // ----- 分享操作 ----
-const shareModalRef = ref()
+const shareModalRef = ref<{ openModal: () => void } | null>(null)
 // 分享链接
 const shareLink = ref<string>()
 // 分享
 const doShare = () => {
   shareLink.value = `${window.location.protocol}//${window.location.host}/picture/${picture.value.id}`
-  if (shareModalRef.value) {
-    shareModalRef.value.openModal()
-  }
+  shareModalRef.value?.openModal()
 }
 </script>
 

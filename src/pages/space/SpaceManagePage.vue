@@ -22,7 +22,7 @@
         />
       </a-form-item>
       <a-form-item label="用户 id">
-        <a-input v-model:value="searchParams.userId" placeholder="请输入用户 id" allow-clear />
+        <a-input v-model:value.number="searchParams.userId" placeholder="请输入用户 id" allow-clear />
       </a-form-item>
       <a-form-item>
         <a-button type="primary" html-type="submit">搜索</a-button>
@@ -64,7 +64,8 @@
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { deleteSpaceUsingPost, listSpaceByPageUsingPost } from '@/api/spaceController.ts'
+import type { TablePaginationConfig } from 'ant-design-vue'
+import { postSpaceOpenApiDelete, postSpaceListPage } from '@/api/space'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
 import { SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS } from '../../constants/space.ts'
@@ -121,7 +122,7 @@ const searchParams = reactive<API.SpaceQueryRequest>({
 
 // 获取数据
 const fetchData = async () => {
-  const res = await listSpaceByPageUsingPost({
+  const res = await postSpaceListPage({
     ...searchParams,
   })
   if (res.data.code === 0 && res.data.data) {
@@ -144,12 +145,12 @@ const pagination = computed(() => {
     pageSize: searchParams.pageSize,
     total: total.value,
     showSizeChanger: true,
-    showTotal: (total) => `共 ${total} 条`,
+    showTotal: (total: number) => `共 ${total} 条`,
   }
 })
 
 // 表格变化之后，重新获取数据
-const doTableChange = (page: any) => {
+const doTableChange = (page: TablePaginationConfig) => {
   searchParams.current = page.current
   searchParams.pageSize = page.pageSize
   fetchData()
@@ -163,11 +164,11 @@ const doSearch = () => {
 }
 
 // 删除数据
-const doDelete = async (id: string) => {
+const doDelete = async (id?: number) => {
   if (!id) {
     return
   }
-  const res = await deleteSpaceUsingPost({ id })
+  const res = await postSpaceOpenApiDelete({ id })
   if (res.data.code === 0) {
     message.success('删除成功')
     // 刷新数据

@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import { listSpaceVoByPageUsingPost } from '@/api/spaceController.ts'
+import { postSpaceListPageVo } from '@/api/space'
 import { message } from 'ant-design-vue'
 import { onMounted } from 'vue'
 
@@ -23,7 +23,7 @@ const checkUserSpace = async () => {
     return
   }
   // 如果用户已登录，会获取该用户已创建的空间
-  const res = await listSpaceVoByPageUsingPost({
+  const res = await postSpaceListPageVo({
     userId: loginUser.id,
     current: 1,
     pageSize: 1,

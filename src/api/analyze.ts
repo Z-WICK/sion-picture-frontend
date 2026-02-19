@@ -1,13 +1,12 @@
-// @ts-ignore
 /* eslint-disable */
 import request from '@/request'
 
-/** getSpaceCategoryAnalyze POST /api/space/analyze/category */
-export async function getSpaceCategoryAnalyzeUsingPost(
+/** Analyze space category POST /space/analyze/category */
+export async function postSpaceAnalyzeCategory(
   body: API.SpaceCategoryAnalyzeRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseListSpaceCategoryAnalyzeResponse_>('/api/space/analyze/category', {
+  return request<API.BaseResponse>('/space/analyze/category', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -17,12 +16,12 @@ export async function getSpaceCategoryAnalyzeUsingPost(
   })
 }
 
-/** getSpaceRankAnalyze POST /api/space/analyze/rank */
-export async function getSpaceRankAnalyzeUsingPost(
+/** Analyze space rank POST /space/analyze/rank */
+export async function postSpaceAnalyzeRank(
   body: API.SpaceRankAnalyzeRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseListSpace_>('/api/space/analyze/rank', {
+  return request<API.BaseResponse>('/space/analyze/rank', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -32,12 +31,12 @@ export async function getSpaceRankAnalyzeUsingPost(
   })
 }
 
-/** getSpaceSizeAnalyze POST /api/space/analyze/size */
-export async function getSpaceSizeAnalyzeUsingPost(
+/** Analyze space size POST /space/analyze/size */
+export async function postSpaceAnalyzeSize(
   body: API.SpaceSizeAnalyzeRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseListSpaceSizeAnalyzeResponse_>('/api/space/analyze/size', {
+  return request<API.BaseResponse>('/space/analyze/size', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -47,12 +46,12 @@ export async function getSpaceSizeAnalyzeUsingPost(
   })
 }
 
-/** getSpaceTagAnalyze POST /api/space/analyze/tag */
-export async function getSpaceTagAnalyzeUsingPost(
+/** Analyze space tags POST /space/analyze/tag */
+export async function postSpaceAnalyzeTag(
   body: API.SpaceTagAnalyzeRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseListSpaceTagAnalyzeResponse_>('/api/space/analyze/tag', {
+  return request<API.BaseResponse>('/space/analyze/tag', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -62,12 +61,12 @@ export async function getSpaceTagAnalyzeUsingPost(
   })
 }
 
-/** getSpaceUsageAnalyze POST /api/space/analyze/usage */
-export async function getSpaceUsageAnalyzeUsingPost(
+/** Analyze space usage POST /space/analyze/usage */
+export async function postSpaceAnalyzeUsage(
   body: API.SpaceUsageAnalyzeRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseSpaceUsageAnalyzeResponse_>('/api/space/analyze/usage', {
+  return request<API.BaseResponse>('/space/analyze/usage', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -77,12 +76,12 @@ export async function getSpaceUsageAnalyzeUsingPost(
   })
 }
 
-/** getSpaceUserAnalyze POST /api/space/analyze/user */
-export async function getSpaceUserAnalyzeUsingPost(
+/** Analyze space users POST /space/analyze/user */
+export async function postSpaceAnalyzeUser(
   body: API.SpaceUserAnalyzeRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseListSpaceUserAnalyzeResponse_>('/api/space/analyze/user', {
+  return request<API.BaseResponse>('/space/analyze/user', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

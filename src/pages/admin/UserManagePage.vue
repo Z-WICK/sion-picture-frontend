@@ -13,7 +13,12 @@
     </a-form>
     <div style="margin-bottom: 16px"></div>
 
-    <a-table :columns="columns" :data-source="dataList" :pagination @change="doTableChange">
+    <a-table
+      :columns="columns"
+      :data-source="dataList"
+      :pagination="pagination"
+      @change="doTableChange"
+    >
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'userAvatar'">
           <a-image :src="record.userAvatar" :width="120"></a-image>
@@ -33,10 +38,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { SmileOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
-import { API } from '@/api'
-import { deleteUserUsingPost, listUserVoByPageUsingPost } from '@/api/userController.ts'
+import type { TablePaginationConfig } from 'ant-design-vue'
+import { postUserOpenApiDelete, postUserListPageVo } from '@/api/user'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
 
@@ -75,7 +79,7 @@ const columns = [
   },
 ]
 // 数据
-const dataList = ref([])
+const dataList = ref<API.UserVO[]>([])
 const total = ref(0)
 // 搜索条件
 const searchParams = reactive<API.UserQueryRequest>({
@@ -87,7 +91,7 @@ const searchParams = reactive<API.UserQueryRequest>({
 
 // 获取数据
 const fetchData = async () => {
-  const res = await listUserVoByPageUsingPost({
+  const res = await postUserListPageVo({
     ...searchParams,
   })
   if (res.data.data) {
@@ -108,11 +112,11 @@ const pagination = computed(() => {
     pageSize: searchParams.pageSize ?? 10,
     total: total.value,
     showSizeChanger: true,
-    showTotal: (total) => `共 ${total} 条`,
+    showTotal: (total: number) => `共 ${total} 条`,
   }
 })
 //表格变化处理
-const doTableChange = (page: any) => {
+const doTableChange = (page: TablePaginationConfig) => {
   searchParams.current = page.current
   searchParams.pageSize = page.pageSize
   fetchData()
@@ -121,18 +125,18 @@ const doTableChange = (page: any) => {
 const doSearch = () => {
   // 重制页码
   searchParams.current = 1
-  fetchData();
+  fetchData()
 }
 
-const doDelete = async (id: string) => {
-  if(!id){
+const doDelete = async (id?: number) => {
+  if (!id) {
     return
   }
-  const res = await deleteUserUsingPost({id})
-  if(res.data.code === 0){
+  const res = await postUserOpenApiDelete({ id })
+  if (res.data.code === 0) {
     message.success('删除成功')
     fetchData()
-  }else{
+  } else {
     message.error('删除失败' + res.data.message)
   }
 }

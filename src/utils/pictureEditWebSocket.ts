@@ -1,7 +1,7 @@
 export default class PictureEditWebSocket {
   private pictureId: number
   private socket: WebSocket | null
-  private eventHandlers: any
+  private eventHandlers: Record<string, Array<(data?: unknown) => void>>
 
   constructor(pictureId: number) {
     this.pictureId = pictureId // 当前编辑的图片 ID
@@ -13,7 +13,8 @@ export default class PictureEditWebSocket {
    * 初始化 WebSocket 连接
    */
   connect() {
-    const url = `ws://localhost:8123/api/ws/picture/edit?pictureId=${this.pictureId}`
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const url = `${wsProtocol}//${window.location.host}/api/ws/picture/edit?pictureId=${this.pictureId}`
     this.socket = new WebSocket(url)
 
     // 设置携带 cookie
@@ -76,7 +77,7 @@ export default class PictureEditWebSocket {
    * @param {string} type 消息类型
    * @param {Function} handler 消息处理函数
    */
-  on(type: string, handler: (data?: any) => void) {
+  on(type: string, handler: (data?: unknown) => void) {
     if (!this.eventHandlers[type]) {
       this.eventHandlers[type] = []
     }
@@ -88,10 +89,10 @@ export default class PictureEditWebSocket {
    * @param {string} type 消息类型
    * @param {Object} data 消息数据
    */
-  triggerEvent(type: string, data?: any) {
+  triggerEvent(type: string, data?: unknown) {
     const handlers = this.eventHandlers[type]
     if (handlers) {
-      handlers.forEach((handler: any) => handler(data))
+      handlers.forEach((handler) => handler(data))
     }
   }
 }

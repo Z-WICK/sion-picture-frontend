@@ -54,7 +54,7 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'url'">
-          <a-image :src="record.url" :width="120" />
+          <a-image :src="resolveImageUrl(record.url)" :width="120" />
         </template>
         <template v-if="column.dataIndex === 'tags'">
           <a-space wrap>
@@ -113,11 +113,12 @@
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import type { TablePaginationConfig } from 'ant-design-vue'
 import {
-  deletePictureUsingPost,
-  doPictureReviewUsingPost,
-  listPictureByPageUsingPost,
-} from '@/api/pictureController.ts'
+  postPictureOpenApiDelete,
+  postPictureReview,
+  postPictureListPage,
+} from '@/api/picture'
 import { message } from 'ant-design-vue'
 import {
   PIC_REVIEW_STATUS_ENUM,
@@ -125,6 +126,7 @@ import {
   PIC_REVIEW_STATUS_OPTIONS,
 } from '../../constants/picture.ts'
 import dayjs from 'dayjs'
+import { resolveImageUrl } from '@/utils'
 
 const columns = [
   {
@@ -194,7 +196,7 @@ const searchParams = reactive<API.PictureQueryRequest>({
 
 // 获取数据
 const fetchData = async () => {
-  const res = await listPictureByPageUsingPost({
+  const res = await postPictureListPage({
     ...searchParams,
     nullSpaceId: true,
   })
@@ -218,12 +220,12 @@ const pagination = computed(() => {
     pageSize: searchParams.pageSize,
     total: total.value,
     showSizeChanger: true,
-    showTotal: (total) => `共 ${total} 条`,
+    showTotal: (total: number) => `共 ${total} 条`,
   }
 })
 
 // 表格变化之后，重新获取数据
-const doTableChange = (page: any) => {
+const doTableChange = (page: TablePaginationConfig) => {
   searchParams.current = page.current
   searchParams.pageSize = page.pageSize
   fetchData()
@@ -237,11 +239,11 @@ const doSearch = () => {
 }
 
 // 删除数据
-const doDelete = async (id: string) => {
+const doDelete = async (id?: number) => {
   if (!id) {
     return
   }
-  const res = await deletePictureUsingPost({ id })
+  const res = await postPictureOpenApiDelete({ id })
   if (res.data.code === 0) {
     message.success('删除成功')
     // 刷新数据
@@ -255,7 +257,7 @@ const doDelete = async (id: string) => {
 const handleReview = async (record: API.Picture, reviewStatus: number) => {
   const reviewMessage =
     reviewStatus === PIC_REVIEW_STATUS_ENUM.PASS ? '管理员操作通过' : '管理员操作拒绝'
-  const res = await doPictureReviewUsingPost({
+  const res = await postPictureReview({
     id: record.id,
     reviewStatus,
     reviewMessage,

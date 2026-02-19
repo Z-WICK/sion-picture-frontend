@@ -52,11 +52,12 @@
 
 <script lang="ts" setup>
 import { computed, h, ref } from 'vue'
-import { HomeOutlined ,LogoutOutlined,UserOutlined} from '@ant-design/icons-vue'
-import { MenuProps, message } from 'ant-design-vue'
+import { HomeOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons-vue'
+import type { MenuProps } from 'ant-design-vue'
+import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import { userLogoutUsingPost } from '@/api/userController.ts'
+import { postUserLogout } from '@/api/user'
 
 const loginUserStore = useLoginUserStore()
 
@@ -72,12 +73,12 @@ const doMenuClick = ({ key }: { key: string }) => {
 }
 
 // 监听路由变化，更新当前选中菜单
-router.afterEach((to, from, next) => {
+router.afterEach((to) => {
   current.value = [to.path]
 })
 //用户注销
 const doLogout = async () => {
-  const res = await userLogoutUsingPost()
+  const res = await postUserLogout()
   console.log(res)
   if (res.data.code === 0) {
     loginUserStore.setLoginUser({
@@ -123,7 +124,8 @@ const originItems = [
 const filterMenus = (menus = [] as MenuProps['items']) => {
   return menus?.filter((menu) => {
     // 如果菜单项的key以/admin开头，则判断用户是否为管理员
-    if (menu?.key?.startsWith('/admin')) {
+    const menuKey = String(menu?.key ?? '')
+    if (menuKey.startsWith('/admin')) {
       const loginUser = loginUserStore.loginUser
       if (!loginUser || loginUser.userRole !== 'admin') {
         return false

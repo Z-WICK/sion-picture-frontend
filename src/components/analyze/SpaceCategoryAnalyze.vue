@@ -10,7 +10,7 @@
 import VChart from 'vue-echarts'
 import 'echarts'
 import { computed, ref, watchEffect } from 'vue'
-import { getSpaceCategoryAnalyzeUsingPost } from '@/api/spaceAnalyzeController.ts'
+import { postSpaceAnalyzeCategory } from '@/api/analyze'
 import { message } from 'ant-design-vue'
 
 interface Props {
@@ -33,7 +33,7 @@ const loading = ref(true)
 const fetchData = async () => {
   loading.value = true
   // 转换搜索参数
-  const res = await getSpaceCategoryAnalyzeUsingPost({
+  const res = await postSpaceAnalyzeCategory({
     queryAll: props.queryAll,
     queryPublic: props.queryPublic,
     spaceId: props.spaceId,
@@ -57,7 +57,9 @@ watchEffect(() => {
 const options = computed(() => {
   const categories = dataList.value.map((item) => item.category)
   const countData = dataList.value.map((item) => item.count)
-  const sizeData = dataList.value.map((item) => (item.totalSize / (1024 * 1024)).toFixed(2)) // 转为 MB
+  const sizeData = dataList.value.map((item) =>
+    ((item.totalSize ?? 0) / (1024 * 1024)).toFixed(2),
+  ) // 转为 MB
 
   return {
     tooltip: { trigger: 'axis' },

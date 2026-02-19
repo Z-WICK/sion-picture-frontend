@@ -66,10 +66,8 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import dayjs from 'dayjs'
-import {
-  listPictureTagCategoryUsingGet,
-  listPictureVoByPageUsingPost,
-} from '@/api/pictureController.ts'
+import type { Dayjs } from 'dayjs'
+import { getPictureTagCategory } from '@/api/picture'
 import { message } from 'ant-design-vue'
 
 interface Props {
@@ -87,15 +85,15 @@ const doSearch = () => {
 }
 
 // 标签和分类选项
-const categoryOptions = ref<string[]>([])
-const tagOptions = ref<string[]>([])
+const categoryOptions = ref<{ value: string; label: string }[]>([])
+const tagOptions = ref<{ value: string; label: string }[]>([])
 
 /**
  * 获取标签和分类选项
  * @param values
  */
 const getTagCategoryOptions = async () => {
-  const res = await listPictureTagCategoryUsingGet()
+  const res = await getPictureTagCategory()
   if (res.data.code === 0 && res.data.data) {
     tagOptions.value = (res.data.data.tagList ?? []).map((data: string) => {
       return {
@@ -110,7 +108,7 @@ const getTagCategoryOptions = async () => {
       }
     })
   } else {
-    message.error('获取标签分类列表失败，' + res.data.message)
+    message.error(`获取标签分类列表失败，${res.data?.message ?? '请稍后重试'}`)
   }
 }
 
@@ -118,17 +116,17 @@ onMounted(() => {
   getTagCategoryOptions()
 })
 
-const dateRange = ref<[]>([])
+const dateRange = ref<Dayjs[] | null>(null)
 
 /**
  * 日期范围更改时触发
  * @param dates
  * @param dateStrings
  */
-const onRangeChange = (dates: any[], dateStrings: string[]) => {
-  if (dates?.length >= 2) {
-    searchParams.startEditTime = dates[0].toDate()
-    searchParams.endEditTime = dates[1].toDate()
+const onRangeChange = (dates: Dayjs[] | null) => {
+  if (dates && dates.length >= 2) {
+    searchParams.startEditTime = dates[0].format('YYYY-MM-DD HH:mm:ss')
+    searchParams.endEditTime = dates[1].format('YYYY-MM-DD HH:mm:ss')
   } else {
     searchParams.startEditTime = undefined
     searchParams.endEditTime = undefined
@@ -146,11 +144,11 @@ const rangePresets = ref([
 // 清理
 const doClear = () => {
   // 取消所有对象的值
-  Object.keys(searchParams).forEach((key) => {
+  ;(Object.keys(searchParams) as Array<keyof API.PictureQueryRequest>).forEach((key) => {
     searchParams[key] = undefined
   })
   // 日期筛选项单独清空，必须定义为空数组
-  dateRange.value = []
+  dateRange.value = null
   // 清空后重新搜索
   props.onSearch?.(searchParams)
 }
