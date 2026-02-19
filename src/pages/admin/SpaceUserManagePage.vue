@@ -1,5 +1,5 @@
 <template>
-  <div id="spaceManagePage">
+  <div id="spaceUserManagePage" class="page-shell">
     <a-result
       v-if="spaceNotFound"
       status="404"
@@ -7,8 +7,8 @@
       sub-title="该空间可能已被删除或不存在，无法继续管理成员。"
     />
     <template v-else>
-      <a-flex justify="space-between">
-        <h2>空间成员管理</h2>
+      <a-flex justify="space-between" class="page-header">
+        <h2 class="page-title">空间成员管理</h2>
         <a-space>
           <a-button type="primary" href="/add_space" target="_blank">+ 创建空间</a-button>
           <a-button type="primary" ghost href="/space_analyze?queryPublic=1" target="_blank"
@@ -19,9 +19,9 @@
           </a-button>
         </a-space>
       </a-flex>
-      <div style="margin-bottom: 16px" />
+      <div class="page-gap" />
       <!-- 添加成员表单 -->
-      <a-form layout="inline" :model="formData" @finish="handleSubmit">
+      <a-form layout="inline" :model="formData" @finish="handleSubmit" class="panel-card no-shadow">
         <a-form-item label="用户 id" name="userId">
           <a-input v-model:value.number="formData.userId" placeholder="请输入用户 id" allow-clear />
         </a-form-item>
@@ -29,40 +29,42 @@
           <a-button type="primary" html-type="submit">添加用户</a-button>
         </a-form-item>
       </a-form>
-      <div style="margin-bottom: 16px" />
+      <div class="page-gap" />
       <!-- 表格 -->
-      <a-table :columns="columns" :data-source="dataList">
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.dataIndex === 'userInfo'">
-            <a-space>
-              <a-avatar :src="record.user?.userAvatar" />
-              {{ record.user?.userName }}
-            </a-space>
+      <div class="table-wrap">
+        <a-table :columns="columns" :data-source="dataList">
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.dataIndex === 'userInfo'">
+              <a-space>
+                <a-avatar :src="record.user?.userAvatar" />
+                {{ record.user?.userName }}
+              </a-space>
+            </template>
+            <template v-if="column.dataIndex === 'spaceRole'">
+              <a-select
+                :value="record.spaceRole"
+                :options="SPACE_ROLE_OPTIONS"
+                @change="handleRoleChange($event, record)"
+              />
+            </template>
+            <template v-else-if="column.dataIndex === 'createTime'">
+              {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+            </template>
+            <template v-else-if="column.key === 'action'">
+              <a-space wrap>
+                <a-button
+                  type="link"
+                  danger
+                  :disabled="isLastAdmin(record)"
+                  @click="doDelete(record.id, record)"
+                >
+                  删除
+                </a-button>
+              </a-space>
+            </template>
           </template>
-          <template v-if="column.dataIndex === 'spaceRole'">
-            <a-select
-              :value="record.spaceRole"
-              :options="SPACE_ROLE_OPTIONS"
-              @change="handleRoleChange($event, record)"
-            />
-          </template>
-          <template v-else-if="column.dataIndex === 'createTime'">
-            {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
-          </template>
-          <template v-else-if="column.key === 'action'">
-            <a-space wrap>
-              <a-button
-                type="link"
-                danger
-                :disabled="isLastAdmin(record)"
-                @click="doDelete(record.id, record)"
-              >
-                删除
-              </a-button>
-            </a-space>
-          </template>
-        </template>
-      </a-table>
+        </a-table>
+      </div>
     </template>
   </div>
 </template>

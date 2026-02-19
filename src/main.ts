@@ -4,6 +4,7 @@ import Antd from 'ant-design-vue'
 import VueCropper from 'vue-cropper';
 import 'vue-cropper/dist/index.css'
 import 'ant-design-vue/dist/reset.css'
+import '@/styles/theme.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import '@/access'
@@ -15,4 +16,3 @@ app.use(router)
 
 app.mount('#app')
 app.use(VueCropper)
-

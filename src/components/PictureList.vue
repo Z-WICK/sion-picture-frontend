@@ -7,20 +7,20 @@
       :loading="loading"
     >
       <template #renderItem="{ item: picture }">
-        <a-list-item style="padding: 0">
+        <a-list-item class="list-item-reset">
           <!-- 单张图片 -->
-          <a-card hoverable @click="doClickPicture(picture)">
+          <a-card class="picture-card" hoverable @click="doClickPicture(picture)">
             <template #cover>
               <img
                 :alt="picture.name"
                 :src="resolveImageUrl(picture.thumbnailUrl ?? picture.url)"
-                style="height: 180px; object-fit: cover"
+                class="image-fixed-180"
               />
             </template>
             <a-card-meta :title="picture.name">
               <template #description>
-                <a-flex>
-                  <a-tag color="green">
+                <a-flex wrap="wrap" gap="small">
+                  <a-tag>
                     {{ picture.category ?? '默认' }}
                   </a-tag>
                   <a-tag v-for="tag in picture.tags" :key="tag">
@@ -134,4 +134,30 @@ const doShare = (picture: API.PictureVO, e: MouseEvent) => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.picture-list .list-item-reset {
+  padding: 0;
+}
+
+.picture-list :deep(.ant-card-actions) {
+  border-top-color: #dde7f2;
+}
+
+.picture-list :deep(.ant-card-actions > li) {
+  margin: 8px 0;
+}
+
+.picture-list :deep(.ant-card-actions .anticon) {
+  min-height: 40px;
+  min-width: 40px;
+  line-height: 40px;
+  border-radius: 10px;
+  color: #5f7288;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.picture-list :deep(.ant-card-actions .anticon:hover) {
+  color: #27486a;
+  background: #e8eff8;
+}
+</style>

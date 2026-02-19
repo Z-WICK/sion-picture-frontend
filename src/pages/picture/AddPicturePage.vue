@@ -1,24 +1,28 @@
 <template>
-  <div id="addPicturePage">
-    <h2 style="margin-bottom: 16px">
-      {{ route.query?.id ? '修改图片' : '创建图片' }}
-    </h2>
+  <div id="addPicturePage" class="page-shell">
+    <div class="page-header">
+      <h2 class="page-title">{{ route.query?.id ? '修改图片' : '创建图片' }}</h2>
+    </div>
     <a-typography-paragraph v-if="spaceId" type="secondary">
       保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
     </a-typography-paragraph>
-    <!-- 选择上传方式 -->
-    <a-tabs v-model:activeKey="uploadType">
-      <a-tab-pane key="file" tab="文件上传">
-        <!-- 图片上传组件 -->
-        <PictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
-      </a-tab-pane>
-      <a-tab-pane key="url" tab="URL 上传" force-render>
-        <!-- URL 图片上传组件 -->
-        <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
-      </a-tab-pane>
-    </a-tabs>
+
+    <section class="panel-card">
+      <!-- 选择上传方式 -->
+      <a-tabs v-model:activeKey="uploadType">
+        <a-tab-pane key="file" tab="文件上传">
+          <!-- 图片上传组件 -->
+          <PictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
+        </a-tab-pane>
+        <a-tab-pane key="url" tab="URL 上传" force-render>
+          <!-- URL 图片上传组件 -->
+          <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
+        </a-tab-pane>
+      </a-tabs>
+    </section>
+
     <!-- 图片编辑 -->
-    <div v-if="picture" class="edit-bar">
+    <section v-if="picture" class="panel-card edit-bar">
       <a-space size="middle">
         <a-button :icon="h(EditOutlined)" @click="doEditPicture">编辑图片</a-button>
         <a-button type="primary" :icon="h(FullscreenOutlined)" @click="doImagePainting">
@@ -39,47 +43,49 @@
         :spaceId="spaceId"
         :onSuccess="onImageOutPaintingSuccess"
       />
-    </div>
+    </section>
+
     <!-- 图片信息表单 -->
-    <a-form
-      v-if="picture"
-      name="pictureForm"
-      layout="vertical"
-      :model="pictureForm"
-      @finish="handleSubmit"
-    >
-      <a-form-item name="name" label="名称">
-        <a-input v-model:value="pictureForm.name" placeholder="请输入名称" allow-clear />
-      </a-form-item>
-      <a-form-item name="introduction" label="简介">
-        <a-textarea
-          v-model:value="pictureForm.introduction"
-          placeholder="请输入简介"
-          :auto-size="{ minRows: 2, maxRows: 5 }"
-          allow-clear
-        />
-      </a-form-item>
-      <a-form-item name="category" label="分类">
-        <a-auto-complete
-          v-model:value="pictureForm.category"
-          placeholder="请输入分类"
-          :options="categoryOptions"
-          allow-clear
-        />
-      </a-form-item>
-      <a-form-item name="tags" label="标签">
-        <a-select
-          v-model:value="pictureForm.tags"
-          mode="tags"
-          placeholder="请输入标签"
-          :options="tagOptions"
-          allow-clear
-        />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" html-type="submit" style="width: 100%">创建</a-button>
-      </a-form-item>
-    </a-form>
+    <section v-if="picture" class="panel-card">
+      <a-form
+        name="pictureForm"
+        layout="vertical"
+        :model="pictureForm"
+        @finish="handleSubmit"
+      >
+        <a-form-item name="name" label="名称">
+          <a-input v-model:value="pictureForm.name" placeholder="请输入名称" allow-clear />
+        </a-form-item>
+        <a-form-item name="introduction" label="简介">
+          <a-textarea
+            v-model:value="pictureForm.introduction"
+            placeholder="请输入简介"
+            :auto-size="{ minRows: 2, maxRows: 5 }"
+            allow-clear
+          />
+        </a-form-item>
+        <a-form-item name="category" label="分类">
+          <a-auto-complete
+            v-model:value="pictureForm.category"
+            placeholder="请输入分类"
+            :options="categoryOptions"
+            allow-clear
+          />
+        </a-form-item>
+        <a-form-item name="tags" label="标签">
+          <a-select
+            v-model:value="pictureForm.tags"
+            mode="tags"
+            placeholder="请输入标签"
+            :options="tagOptions"
+            allow-clear
+          />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" html-type="submit" class="btn-full">创建</a-button>
+        </a-form-item>
+      </a-form>
+    </section>
   </div>
 </template>
 
@@ -314,6 +320,5 @@ watch(spaceId, fetchSpace, {
 
 #addPicturePage .edit-bar {
   text-align: center;
-  margin: 16px 0;
 }
 </style>

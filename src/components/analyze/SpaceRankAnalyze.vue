@@ -1,7 +1,7 @@
 <template>
   <div class="space-rank-analyze">
     <a-card title="空间使用排行分析">
-      <v-chart :option="options" style="height: 320px; max-width: 100%;" :loading="loading" />
+      <v-chart class="analyze-chart" :option="options" :loading="loading" />
     </a-card>
   </div>
 </template>
@@ -72,12 +72,10 @@ const options = computed(() => {
         type: 'bar',
         data: usageData,
         itemStyle: {
-          color: '#5470C6', // 自定义柱状图颜色
+          color: '#5a7390',
         },
       },
     ],
   }
 })
 </script>
-
-<style scoped></style>

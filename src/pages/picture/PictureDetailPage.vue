@@ -1,10 +1,10 @@
 <template>
-  <div id="pictureDetailPage">
+  <div id="pictureDetailPage" class="page-shell">
     <a-row :gutter="[16, 16]">
       <!-- 图片预览 -->
       <a-col :sm="24" :md="16" :xl="18">
         <a-card title="图片预览">
-          <a-image :src="pictureUrl" style="max-height: 600px; object-fit: contain" />
+          <a-image :src="pictureUrl" class="image-contained-600" />
         </a-card>
       </a-col>
       <!-- 图片信息区域 -->
@@ -51,11 +51,8 @@
                 {{ picture.picColor ?? '-' }}
                 <div
                   v-if="picture.picColor"
-                  :style="{
-                    width: '16px',
-                    height: '16px',
-                    backgroundColor: toHexColor(picture.picColor),
-                  }"
+                  class="color-swatch"
+                  :style="{ backgroundColor: toHexColor(picture.picColor) }"
                 />
               </a-space>
             </a-descriptions-item>
@@ -211,5 +208,12 @@ const doShare = () => {
 <style scoped>
 #pictureDetailPage {
   margin-bottom: 16px;
+}
+
+.color-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccdae8;
 }
 </style>

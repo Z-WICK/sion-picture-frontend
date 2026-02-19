@@ -1,7 +1,7 @@
 <template>
   <div class="space-category-analyze">
     <a-card title="空间图片分类分析">
-      <v-chart :option="options" style="height: 320px; max-width: 100%;" :loading="loading" />
+      <v-chart class="analyze-chart" :option="options" :loading="loading" />
     </a-card>
   </div>
 </template>
@@ -62,24 +62,31 @@ const options = computed(() => {
   ) // 转为 MB
 
   return {
+    color: ['#5a7390', '#90a4bc'],
     tooltip: { trigger: 'axis' },
     legend: { data: ['图片数量', '图片总大小'], top: 'bottom' },
-    xAxis: { type: 'category', data: categories },
+    xAxis: {
+      type: 'category',
+      data: categories,
+      axisLabel: {
+        color: '#60758d',
+      },
+    },
     yAxis: [
       {
         type: 'value',
         name: '图片数量',
-        axisLine: { show: true, lineStyle: { color: '#5470C6' } }, // 左轴颜色
+        axisLine: { show: true, lineStyle: { color: '#5a7390' } },
       },
       {
         type: 'value',
         name: '图片总大小 (MB)',
         position: 'right',
-        axisLine: { show: true, lineStyle: { color: '#91CC75' } }, // 右轴颜色
+        axisLine: { show: true, lineStyle: { color: '#90a4bc' } },
         splitLine: {
           lineStyle: {
-            color: '#91CC75', // 调整网格线颜色
-            type: 'dashed', // 线条样式：可选 'solid', 'dashed', 'dotted'
+            color: '#dbe5f0',
+            type: 'dashed',
           },
         },
       },
@@ -91,5 +98,3 @@ const options = computed(() => {
   }
 })
 </script>
-
-<style scoped></style>

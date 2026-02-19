@@ -1,40 +1,44 @@
 <template>
-  <div id="userProfilePage">
-    <h2 class="title">个人信息</h2>
-    <div class="desc">修改昵称、头像和简介</div>
-    <a-form :model="formState" layout="vertical" autocomplete="off" @finish="handleSubmit">
-      <a-form-item name="userName" label="昵称" :rules="[{ required: true, message: '请输入昵称' }]">
-        <a-input
-          v-model:value="formState.userName"
-          :maxlength="30"
-          placeholder="请输入昵称"
-          allow-clear
-        />
-      </a-form-item>
-      <a-form-item name="userAvatar" label="头像链接">
-        <a-input
-          v-model:value="formState.userAvatar"
-          :maxlength="512"
-          placeholder="请输入头像 URL"
-          allow-clear
-        />
-      </a-form-item>
-      <a-form-item name="userProfile" label="个人简介">
-        <a-textarea
-          v-model:value="formState.userProfile"
-          :maxlength="200"
-          :auto-size="{ minRows: 4, maxRows: 6 }"
-          placeholder="请输入个人简介"
-          show-count
-        />
-      </a-form-item>
-      <a-form-item>
-        <a-space>
-          <a-button type="primary" html-type="submit" :loading="submitting">保存</a-button>
-          <a-button @click="resetForm">重置</a-button>
-        </a-space>
-      </a-form-item>
-    </a-form>
+  <div id="userProfilePage" class="page-shell">
+    <div class="page-header">
+      <h2 class="page-title">个人信息</h2>
+    </div>
+    <p class="page-subtitle">修改昵称、头像和简介</p>
+    <section class="panel-card">
+      <a-form :model="formState" layout="vertical" autocomplete="off" @finish="handleSubmit">
+        <a-form-item name="userName" label="昵称" :rules="[{ required: true, message: '请输入昵称' }]">
+          <a-input
+            v-model:value="formState.userName"
+            :maxlength="30"
+            placeholder="请输入昵称"
+            allow-clear
+          />
+        </a-form-item>
+        <a-form-item name="userAvatar" label="头像链接">
+          <a-input
+            v-model:value="formState.userAvatar"
+            :maxlength="512"
+            placeholder="请输入头像 URL"
+            allow-clear
+          />
+        </a-form-item>
+        <a-form-item name="userProfile" label="个人简介">
+          <a-textarea
+            v-model:value="formState.userProfile"
+            :maxlength="200"
+            :auto-size="{ minRows: 4, maxRows: 6 }"
+            placeholder="请输入个人简介"
+            show-count
+          />
+        </a-form-item>
+        <a-form-item>
+          <a-space>
+            <a-button type="primary" html-type="submit" :loading="submitting">保存</a-button>
+            <a-button @click="resetForm">重置</a-button>
+          </a-space>
+        </a-form-item>
+      </a-form>
+    </section>
   </div>
 </template>
 
@@ -121,14 +125,5 @@ onMounted(async () => {
 #userProfilePage {
   max-width: 680px;
   margin: 0 auto;
-}
-
-.title {
-  margin-bottom: 8px;
-}
-
-.desc {
-  color: #888;
-  margin-bottom: 16px;
 }
 </style>

@@ -6,22 +6,22 @@
     :footer="false"
     @cancel="closeModal"
   >
-    <a-row :gutter="16">
-      <a-col span="12">
+    <a-row :gutter="[16, 16]" class="preview-grid">
+      <a-col :xs="24" :md="12">
         <h4>原始图片</h4>
-        <img :src="sourceImageUrl" :alt="picture?.name" style="max-width: 100%" />
+        <img class="painting-preview" :src="sourceImageUrl" :alt="picture?.name" />
       </a-col>
-      <a-col span="12">
+      <a-col :xs="24" :md="12">
         <h4>扩图结果</h4>
         <img
           v-if="resultImageUrl"
+          class="painting-preview"
           :src="resultImageUrl"
           :alt="picture?.name"
-          style="max-width: 100%"
         />
       </a-col>
     </a-row>
-    <div style="margin-bottom: 16px" />
+    <div class="page-gap" />
     <a-flex justify="center" gap="16">
       <a-button type="primary" :loading="!!taskId" ghost @click="createTask">生成图片</a-button>
       <a-button v-if="resultImageUrl" type="primary" :loading="uploadLoading" @click="handleUpload">
@@ -196,8 +196,14 @@ defineExpose({
 })
 </script>
 
-<style>
+<style scoped>
 .image-out-painting {
   text-align: center;
+}
+
+.painting-preview {
+  max-width: 100%;
+  border-radius: 12px;
+  border: 1px solid #d7e2ee;
 }
 </style>

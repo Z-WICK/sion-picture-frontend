@@ -1,7 +1,7 @@
 <template>
   <div class="space-size-analyze">
     <a-card title="空间图片大小分析">
-      <v-chart :option="options" style="height: 320px; max-width: 100%" :loading="loading" />
+      <v-chart class="analyze-chart" :option="options" :loading="loading" />
     </a-card>
   </div>
 </template>
@@ -61,6 +61,7 @@ const options = computed(() => {
   }))
 
   return {
+    color: ['#5a7390', '#7691ab', '#8ea4bc', '#6a829b', '#486481'],
     tooltip: {
       trigger: 'item',
       formatter: '{a} <br/>{b}: {c} ({d}%)',
@@ -79,5 +80,3 @@ const options = computed(() => {
   }
 })
 </script>
-
-<style scoped></style>

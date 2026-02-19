@@ -1,7 +1,9 @@
 <template>
-  <div id="addPictureBatchPage">
-    <div id="addPictureBatchPage">
-      <h2 style="margin-bottom: 16px">批量创建图片</h2>
+  <div id="addPictureBatchPage" class="page-shell">
+    <div class="page-header">
+      <h2 class="page-title">批量创建图片</h2>
+    </div>
+    <section class="panel-card">
       <a-form layout="vertical" :model="formData" @finish="handleSubmit">
         <a-form-item label="关键词" name="searchText">
           <a-input v-model:value="formData.searchText" placeholder="请输入关键词" />
@@ -10,7 +12,7 @@
           <a-input-number
             v-model:value="formData.count"
             placeholder="请输入数量"
-            style="min-width: 180px"
+            class="w-180"
             :min="1"
             :max="30"
             allow-clear
@@ -23,12 +25,12 @@
           />
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" html-type="submit" style="width: 100%" :loading="loading">
+          <a-button type="primary" html-type="submit" class="btn-full" :loading="loading">
             执行任务
           </a-button>
         </a-form-item>
       </a-form>
-    </div>
+    </section>
   </div>
 </template>
 
@@ -63,5 +65,7 @@ const handleSubmit = async () => {
 
 <style scoped>
 #addPictureBatchPage {
+  max-width: 720px;
+  margin: 0 auto;
 }
 </style>

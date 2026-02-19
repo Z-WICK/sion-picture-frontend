@@ -1,6 +1,6 @@
 <template>
-  <div id="spaceAnalyzePage">
-    <h2>
+  <div id="spaceAnalyzePage" class="page-shell">
+    <h2 class="page-title">
       空间图库分析 -
       <span v-if="queryAll">全部空间</span>
       <span v-else-if="queryPublic">公共图库</span>
@@ -8,7 +8,7 @@
         <a :href="`/space/${spaceId}`" target="_blank">空间 id：{{ spaceId }}</a>
       </span>
     </h2>
-    <div style="margin-bottom: 16px" />
+    <div class="page-gap" />
     <a-spin :spinning="checkingPermission">
       <a-result
         v-if="!checkingPermission && analyzeAccessState === 'not_found'"

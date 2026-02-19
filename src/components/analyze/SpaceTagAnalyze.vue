@@ -1,7 +1,7 @@
 <template>
   <div class="space-tag-analyze">
     <a-card title="空间图片标签分析">
-      <v-chart :option="options" style="height: 320px; max-width: 100%" :loading="loading" />
+      <v-chart class="analyze-chart" :option="options" :loading="loading" />
     </a-card>
   </div>
 </template>
@@ -60,6 +60,7 @@ const options = computed(() => {
     name: item.tag,
     value: item.count,
   }))
+  const palette = ['#5e7896', '#7f95ad', '#6e889f', '#8ea2ba', '#4e6988', '#95aac0']
 
   return {
     tooltip: {
@@ -74,10 +75,9 @@ const options = computed(() => {
         rotationRange: [-90, 90],
         shape: 'circle',
         textStyle: {
-          color: () =>
-            `rgb(${Math.round(Math.random() * 255)}, ${Math.round(
-              Math.random() * 255,
-            )}, ${Math.round(Math.random() * 255)})`, // 随机颜色
+          color: (params: { dataIndex: number }) => {
+            return palette[params.dataIndex % palette.length]
+          },
         },
         data: tagData,
       },
@@ -85,5 +85,3 @@ const options = computed(() => {
   }
 })
 </script>
-
-<style scoped></style>

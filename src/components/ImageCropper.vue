@@ -17,7 +17,7 @@
       :auto-crop="true"
       :center-box="true"
     />
-    <div style="margin-bottom: 16px" />
+    <div class="page-gap" />
     <!-- 协同编辑操作 -->
     <div class="image-edit-actions" v-if="isTeamSpace">
       <a-space>
@@ -26,7 +26,7 @@
         <a-button v-if="canExitEdit" danger ghost @click="exitEdit">退出编辑</a-button>
       </a-space>
     </div>
-    <div style="margin-bottom: 16px" />
+    <div class="page-gap" />
     <!-- 图片操作 -->
     <div class="image-cropper-actions">
       <a-space>
@@ -310,12 +310,23 @@ const editAction = (action: string) => {
 }
 </script>
 
-<style>
+<style scoped>
 .image-cropper {
   text-align: center;
 }
 
-.image-cropper .vue-cropper {
+.image-cropper :deep(.vue-cropper) {
   height: 400px !important;
+}
+
+.image-cropper :deep(.cropper-view-box),
+.image-cropper :deep(.cropper-face) {
+  border-radius: 6px;
+}
+
+.image-cropper-actions,
+.image-edit-actions {
+  display: flex;
+  justify-content: center;
 }
 </style>

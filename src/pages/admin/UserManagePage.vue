@@ -1,6 +1,10 @@
 <template>
-  <div id="userManagePage">
-    <a-form layout="inline" :model="searchParams" @finish="doSearch">
+  <div id="userManagePage" class="page-shell">
+    <div class="page-header">
+      <h2 class="page-title">用户管理</h2>
+    </div>
+
+    <a-form layout="inline" :model="searchParams" @finish="doSearch" class="panel-card no-shadow">
       <a-form-item label="账号">
         <a-input v-model:value="searchParams.userAccount" placeholder="输入账号" allow-clear />
       </a-form-item>
@@ -11,30 +15,32 @@
         <a-button type="primary" html-type="submit">搜索</a-button>
       </a-form-item>
     </a-form>
-    <div style="margin-bottom: 16px"></div>
+    <div class="page-gap" />
 
-    <a-table
-      :columns="columns"
-      :data-source="dataList"
-      :pagination="pagination"
-      @change="doTableChange"
-    >
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.dataIndex === 'userAvatar'">
-          <a-image :src="record.userAvatar" :width="120"></a-image>
+    <div class="table-wrap">
+      <a-table
+        :columns="columns"
+        :data-source="dataList"
+        :pagination="pagination"
+        @change="doTableChange"
+      >
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.dataIndex === 'userAvatar'">
+            <a-image :src="record.userAvatar" :width="120"></a-image>
+          </template>
+          <template v-else-if="column.dataIndex === 'userRole'">
+            <a-tag class="role-tag" v-if="record.userRole === 'admin'">管理员</a-tag>
+            <a-tag class="role-tag" v-else>普通用户</a-tag>
+          </template>
+          <template v-if="column.dataIndex === 'createTime'">
+            {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+          <template v-else-if="column.key === 'action'">
+            <a-button danger @click="doDelete(record.id)">删除</a-button>
+          </template>
         </template>
-        <template v-else-if="column.dataIndex === 'userRole'">
-          <a-tag v-if="record.userRole === 'admin'" color="green">管理员</a-tag>
-          <a-tag v-else color="blue">普通用户</a-tag>
-        </template>
-        <template v-if="column.dataIndex === 'createTime'">
-          {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
-        </template>
-        <template v-else-if="column.key === 'action'">
-          <a-button danger @click="doDelete(record.id)">删除</a-button>
-        </template>
-      </template>
-    </a-table>
+      </a-table>
+    </div>
   </div>
 </template>
 <script lang="ts" setup>
@@ -149,3 +155,10 @@ const doDelete = async (id?: number) => {
   }
 }
 </script>
+
+<style scoped>
+.role-tag {
+  min-width: 76px;
+  text-align: center;
+}
+</style>

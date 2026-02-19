@@ -1,6 +1,6 @@
 <template>
-  <div id="mySpacePage">
-    <p>正在跳转，请稍后。。。</p>
+  <div id="mySpacePage" class="page-shell">
+    <p class="page-subtitle">正在跳转，请稍后...</p>
   </div>
 </template>
 

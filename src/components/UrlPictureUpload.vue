@@ -1,12 +1,12 @@
 <template>
   <div class="url-picture-upload">
-    <a-input-group compact>
+    <a-input-group compact class="url-input-group">
       <a-input
         v-model:value="fileUrl"
-        style="width: calc(100% - 120px)"
+        class="w-calc-url-input"
         placeholder="请输入图片地址"
       />
-      <a-button type="primary" style="width: 120px" :loading="loading" @click="handleUpload">
+      <a-button type="primary" class="w-120" :loading="loading" @click="handleUpload">
         提交
       </a-button>
     </a-input-group>
@@ -79,15 +79,28 @@ const handleUpload = async () => {
 <style scoped>
 .url-picture-upload {
   margin-bottom: 16px;
+  display: grid;
+  gap: 16px;
 }
 
 .url-picture-upload img {
   max-width: 100%;
   max-height: 480px;
+  border-radius: 12px;
+  border: 1px solid #d6e1ee;
 }
 
 .url-picture-upload .img-wrapper {
   text-align: center;
-  margin-top: 16px;
+}
+
+.url-picture-upload :deep(.url-input-group .ant-input) {
+  border-start-end-radius: 0 !important;
+  border-end-end-radius: 0 !important;
+}
+
+.url-picture-upload :deep(.url-input-group .ant-btn) {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
 }
 </style>

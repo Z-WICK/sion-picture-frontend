@@ -1,7 +1,7 @@
 <template>
   <div class="space-user-analyze">
     <a-card title="空间图片用户分析">
-      <v-chart :option="options" style="height: 320px; max-width: 100%" :loading="loading" />
+      <v-chart class="analyze-chart" :option="options" :loading="loading" />
       <template #extra>
         <a-space>
           <a-segmented v-model:value="timeDimension" :options="timeDimensionOptions" />
@@ -91,6 +91,7 @@ const options = computed(() => {
   const counts = dataList.value.map((item) => item.count) // 上传数量
 
   return {
+    color: ['#5c7794'],
     tooltip: { trigger: 'axis' },
     xAxis: { type: 'category', data: periods, name: '时间区间' },
     yAxis: { type: 'value', name: '上传数量' },
@@ -108,5 +109,3 @@ const options = computed(() => {
   }
 })
 </script>
-
-<style scoped></style>

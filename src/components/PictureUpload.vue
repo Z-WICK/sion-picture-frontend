@@ -8,13 +8,14 @@
     >
       <img
         v-if="picture?.url"
+        class="preview-image"
         :src="getPictureFileUrl(picture?.id) ?? resolveImageUrl(picture?.url)"
         alt="avatar"
       />
-      <div v-else>
+      <div v-else class="upload-empty">
         <loading-outlined v-if="loading"></loading-outlined>
         <plus-outlined v-else></plus-outlined>
-        <div class="ant-upload-text">点击或拖拽上传图片</div>
+        <div class="upload-text">点击或拖拽上传图片</div>
       </div>
     </a-upload>
   </div>
@@ -89,18 +90,35 @@ const beforeUpload = (file: UploadFile) => {
   min-height: 152px;
 }
 
-.picture-upload img {
+.picture-upload :deep(.ant-upload-select-picture-card) {
+  border: 1px dashed #b4c6da;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #f8fbff 0%, #edf3fa 100%);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.picture-upload :deep(.ant-upload-select-picture-card:hover) {
+  border-color: #8ea5bf;
+  background: #f0f6fd;
+}
+
+.picture-upload .preview-image {
   max-width: 100%;
   max-height: 480px;
+  border-radius: 10px;
 }
 
-.ant-upload-select-picture-card i {
+.picture-upload .upload-empty {
+  color: #5e748b;
+}
+
+.picture-upload .upload-empty :deep(i) {
   font-size: 32px;
-  color: #999;
+  color: #5e748b;
 }
 
-.ant-upload-select-picture-card .ant-upload-text {
+.picture-upload .upload-text {
   margin-top: 8px;
-  color: #666;
+  color: #5e748b;
 }
 </style>

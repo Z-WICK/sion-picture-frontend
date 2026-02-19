@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div class="share-modal">
     <a-modal v-model:open="visible" :title="title" :footer="false" @cancel="closeModal">
       <h4>复制分享链接</h4>
       <a-typography-link copyable>
         {{ link }}
       </a-typography-link>
-      <div style="margin-bottom: 16px" />
+      <div class="page-gap" />
       <h4>手机扫码查看</h4>
       <a-qrcode :value="link" />
     </a-modal>
@@ -44,3 +44,9 @@ defineExpose({
   openModal,
 })
 </script>
+
+<style scoped>
+.share-modal :deep(.ant-qrcode) {
+  margin: 0 auto;
+}
+</style>

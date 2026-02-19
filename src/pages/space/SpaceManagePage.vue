@@ -1,21 +1,21 @@
 <template>
-  <div id="spaceManagePage">
-    <a-flex justify="space-between">
-      <h2>空间管理</h2>
+  <div id="spaceManagePage" class="page-shell">
+    <a-flex justify="space-between" class="page-header">
+      <h2 class="page-title">空间管理</h2>
       <a-space>
         <a-button type="primary" href="/add_space" target="_blank">+ 创建空间</a-button>
       </a-space>
     </a-flex>
-    <div style="margin-bottom: 16px" />
+    <div class="page-gap" />
     <!-- 搜索表单 -->
-    <a-form layout="inline" :model="searchParams" @finish="doSearch">
+    <a-form layout="inline" :model="searchParams" @finish="doSearch" class="panel-card no-shadow">
       <a-form-item label="空间名称">
         <a-input v-model:value="searchParams.spaceName" placeholder="请输入空间名称" allow-clear />
       </a-form-item>
       <a-form-item name="spaceLevel" label="空间级别">
         <a-select
           v-model:value="searchParams.spaceLevel"
-          style="min-width: 180px"
+          class="w-180"
           placeholder="请选择空间级别"
           :options="SPACE_LEVEL_OPTIONS"
           allow-clear
@@ -28,38 +28,40 @@
         <a-button type="primary" html-type="submit">搜索</a-button>
       </a-form-item>
     </a-form>
-    <div style="margin-bottom: 16px" />
+    <div class="page-gap" />
     <!-- 表格 -->
-    <a-table
-      :columns="columns"
-      :data-source="dataList"
-      :pagination="pagination"
-      @change="doTableChange"
-    >
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.dataIndex === 'spaceLevel'">
-          <div>{{ SPACE_LEVEL_MAP[record.spaceLevel] }}</div>
+    <div class="table-wrap">
+      <a-table
+        :columns="columns"
+        :data-source="dataList"
+        :pagination="pagination"
+        @change="doTableChange"
+      >
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.dataIndex === 'spaceLevel'">
+            <div>{{ SPACE_LEVEL_MAP[record.spaceLevel] }}</div>
+          </template>
+          <template v-if="column.dataIndex === 'spaceUseInfo'">
+            <div>大小：{{ formatSize(record.totalSize) }} / {{ formatSize(record.maxSize) }}</div>
+            <div>数量：{{ record.totalCount }} / {{ record.maxCount }}</div>
+          </template>
+          <template v-if="column.dataIndex === 'createTime'">
+            {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+          <template v-if="column.dataIndex === 'editTime'">
+            {{ dayjs(record.editTime).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+          <template v-else-if="column.key === 'action'">
+            <a-space wrap>
+              <a-button type="link" :href="`/add_space?id=${record.id}`" target="_blank">
+                编辑
+              </a-button>
+              <a-button danger @click="doDelete(record.id)">删除</a-button>
+            </a-space>
+          </template>
         </template>
-        <template v-if="column.dataIndex === 'spaceUseInfo'">
-          <div>大小：{{ formatSize(record.totalSize) }} / {{ formatSize(record.maxSize) }}</div>
-          <div>数量：{{ record.totalCount }} / {{ record.maxCount }}</div>
-        </template>
-        <template v-if="column.dataIndex === 'createTime'">
-          {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
-        </template>
-        <template v-if="column.dataIndex === 'editTime'">
-          {{ dayjs(record.editTime).format('YYYY-MM-DD HH:mm:ss') }}
-        </template>
-        <template v-else-if="column.key === 'action'">
-          <a-space wrap>
-            <a-button type="link" :href="`/add_space?id=${record.id}`" target="_blank">
-              编辑
-            </a-button>
-            <a-button danger @click="doDelete(record.id)">删除</a-button>
-          </a-space>
-        </template>
-      </template>
-    </a-table>
+      </a-table>
+    </div>
   </div>
 </template>
 <script lang="ts" setup>

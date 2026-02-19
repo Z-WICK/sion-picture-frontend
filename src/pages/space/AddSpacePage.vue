@@ -1,36 +1,38 @@
 <template>
-  <div id="addSpacePage">
-    <h2 style="margin-bottom: 16px">
-      {{ route.query?.id ? '修改' : '创建' }} {{ SPACE_TYPE_MAP[spaceType] }}
-    </h2>
+  <div id="addSpacePage" class="page-shell">
+    <div class="page-header">
+      <h2 class="page-title">{{ route.query?.id ? '修改' : '创建' }} {{ SPACE_TYPE_MAP[spaceType] }}</h2>
+    </div>
     <!-- 空间信息表单 -->
-    <a-form name="spaceForm" layout="vertical" :model="spaceForm" @finish="handleSubmit">
-      <a-form-item
-        name="spaceName"
-        label="空间名称"
-        :rules="[{ required: true, message: '请输入空间名称' }]"
-      >
-        <a-input v-model:value="spaceForm.spaceName" placeholder="请输入空间" allow-clear />
-      </a-form-item>
-      <a-form-item
-        name="spaceLevel"
-        label="空间级别"
-        :rules="[{ required: true, message: '请选择空间级别' }]"
-      >
-        <a-select
-          v-model:value="spaceForm.spaceLevel"
-          style="min-width: 180px"
-          placeholder="请选择空间级别"
-          :options="SPACE_LEVEL_OPTIONS"
-          allow-clear
-        />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" html-type="submit" :loading="loading" style="width: 100%">
-          提交
-        </a-button>
-      </a-form-item>
-    </a-form>
+    <section class="panel-card">
+      <a-form name="spaceForm" layout="vertical" :model="spaceForm" @finish="handleSubmit">
+        <a-form-item
+          name="spaceName"
+          label="空间名称"
+          :rules="[{ required: true, message: '请输入空间名称' }]"
+        >
+          <a-input v-model:value="spaceForm.spaceName" placeholder="请输入空间" allow-clear />
+        </a-form-item>
+        <a-form-item
+          name="spaceLevel"
+          label="空间级别"
+          :rules="[{ required: true, message: '请选择空间级别' }]"
+        >
+          <a-select
+            v-model:value="spaceForm.spaceLevel"
+            class="w-180"
+            placeholder="请选择空间级别"
+            :options="SPACE_LEVEL_OPTIONS"
+            allow-clear
+          />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" html-type="submit" :loading="loading" class="btn-full">
+            提交
+          </a-button>
+        </a-form-item>
+      </a-form>
+    </section>
     <!-- 空间级别介绍 -->
     <a-card title="空间级别介绍">
       <a-typography-paragraph>

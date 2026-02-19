@@ -1,5 +1,5 @@
 <template>
-  <div id="spaceDetailPage">
+  <div id="spaceDetailPage" class="page-shell">
     <a-result
       v-if="spaceNotFound"
       status="404"
@@ -8,8 +8,8 @@
     />
     <template v-else>
     <!-- 空间信息 -->
-    <a-flex justify="space-between">
-      <h2>{{ space.spaceName }}（{{ SPACE_TYPE_MAP[space.spaceType] }}）</h2>
+    <a-flex justify="space-between" class="page-header">
+      <h2 class="page-title">{{ space.spaceName }}（{{ SPACE_TYPE_MAP[space.spaceType] }}）</h2>
       <a-space size="middle">
         <a-button
           v-if="canUploadPicture"
@@ -49,12 +49,12 @@
         </a-tooltip>
       </a-space>
     </a-flex>
-    <div style="margin-bottom: 16px" />
+    <div class="page-gap" />
     <!-- 搜索表单 -->
     <PictureSearchForm :onSearch="onSearch" />
-    <div style="margin-bottom: 16px" />
+    <div class="page-gap" />
     <!-- 按颜色搜索，跟其他搜索条件独立 -->
-    <a-form-item label="按颜色搜索">
+    <a-form-item label="按颜色搜索" class="color-filter">
       <color-picker format="hex" @pureColorChange="onColorChange" />
     </a-form-item>
     <!-- 图片列表 -->
@@ -68,7 +68,7 @@
     />
     <!-- 分页 -->
     <a-pagination
-      style="text-align: right"
+      class="text-right"
       v-model:current="searchParams.current"
       v-model:pageSize="searchParams.pageSize"
       :total="total"
@@ -326,5 +326,18 @@ watch(
 <style scoped>
 #spaceDetailPage {
   margin-bottom: 16px;
+}
+
+#spaceDetailPage .color-filter {
+  margin-bottom: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid #d5dfeb;
+  background: #f6faff;
+}
+
+#spaceDetailPage :deep(.vc-color-wrap) {
+  border-radius: 10px;
+  border: 1px solid #c7d5e4;
 }
 </style>

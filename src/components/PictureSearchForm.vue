@@ -1,7 +1,7 @@
 <template>
-  <div class="picture-search-form">
+  <div class="picture-search-form panel-card no-shadow form-inline-panel">
     <!-- 搜索表单 -->
-    <a-form name="searchForm" layout="inline" :model="searchParams" @finish="doSearch">
+    <a-form class="search-form" name="searchForm" layout="inline" :model="searchParams" @finish="doSearch">
       <a-form-item label="关键词" name="searchText">
         <a-input
           v-model:value="searchParams.searchText"
@@ -11,8 +11,8 @@
       </a-form-item>
       <a-form-item name="category" label="分类">
         <a-auto-complete
+          class="w-180"
           v-model:value="searchParams.category"
-          style="min-width: 180px"
           placeholder="请输入分类"
           :options="categoryOptions"
           allow-clear
@@ -20,8 +20,8 @@
       </a-form-item>
       <a-form-item name="tags" label="标签">
         <a-select
+          class="w-180"
           v-model:value="searchParams.tags"
-          style="min-width: 180px"
           mode="tags"
           placeholder="请输入标签"
           :options="tagOptions"
@@ -30,7 +30,7 @@
       </a-form-item>
       <a-form-item label="日期" name="dateRange">
         <a-range-picker
-          style="width: 400px"
+          class="w-400"
           show-time
           v-model:value="dateRange"
           :placeholder="['编辑开始时间', '编辑结束时间']"
@@ -56,7 +56,7 @@
       </a-form-item>
       <a-form-item>
         <a-space>
-          <a-button type="primary" html-type="submit" style="width: 96px">搜索</a-button>
+          <a-button type="primary" html-type="submit" class="w-120">搜索</a-button>
           <a-button html-type="reset" @click="doClear">重置</a-button>
         </a-space>
       </a-form-item>
@@ -155,7 +155,12 @@ const doClear = () => {
 </script>
 
 <style scoped>
-.picture-search-form .ant-form-item {
-  margin-top: 16px;
+.picture-search-form :deep(.search-form .ant-form-item) {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+.picture-search-form :deep(.ant-form-item-label) {
+  min-width: 44px;
 }
 </style>
