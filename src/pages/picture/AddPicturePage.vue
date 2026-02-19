@@ -27,7 +27,7 @@
       </a-space>
       <ImageCropper
         ref="imageCropperRef"
-        :imageUrl="resolveImageUrl(picture?.url)"
+        :imageUrl="cropperImageUrl"
         :picture="picture"
         :spaceId="spaceId"
         :space="space"
@@ -98,7 +98,7 @@ import ImageCropper from '@/components/ImageCropper.vue'
 import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
 import ImageOutPainting from '@/components/ImageOutPainting.vue'
 import { getSpaceGetVo } from '@/api/space'
-import { resolveImageUrl } from '@/utils'
+import { getPictureFileUrl, resolveImageUrl } from '@/utils'
 
 const router = useRouter()
 const route = useRoute()
@@ -106,6 +106,9 @@ const route = useRoute()
 const picture = ref<API.PictureVO>()
 const pictureForm = reactive<API.PictureEditRequest>({})
 const uploadType = ref<'file' | 'url'>('file')
+const cropperImageUrl = computed(() => {
+  return getPictureFileUrl(picture.value?.id) ?? resolveImageUrl(picture.value?.url)
+})
 // 空间 id
 const spaceId = computed(() => {
   const id = Number(route.query?.spaceId)

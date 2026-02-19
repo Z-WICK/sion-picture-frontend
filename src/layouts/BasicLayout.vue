@@ -36,10 +36,6 @@ import GlobalSider from '@/components/GlobalSider.vue'
 #basicLayout .footer {
   background: #efefef;
   padding: 16px;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
   text-align: center;
 }
 

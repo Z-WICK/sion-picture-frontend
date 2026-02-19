@@ -41,6 +41,13 @@ const formState = reactive<API.UserLoginRequest>({
 const router = useRouter()
 const route = useRoute()
 const loginUserStore = useLoginUserStore()
+const getApiErrorMessage = (error: unknown) => {
+  const maybeResponse = (error as { response?: { data?: { message?: string } } })?.response
+  return maybeResponse?.data?.message
+}
+const getErrorMessage = (error: unknown) => {
+  return getApiErrorMessage(error) ?? (error instanceof Error ? error.message : String(error))
+}
 
 const getSafeRedirectPath = () => {
   const redirectParam = route.query.redirect
@@ -60,21 +67,25 @@ const getSafeRedirectPath = () => {
 }
 
 const handleSubmit = async (values: API.UserLoginRequest) => {
-  const res = await postUser(values)
-  // 登录成功，把登录状态保存到全局状态中
-  if (res.data.code === 0 && res.data.data) {
-    await loginUserStore.fetchLoginUser()
-    message.success('登录成功')
-    const redirectPath = getSafeRedirectPath()
-    const loginUserRole = loginUserStore.loginUser.userRole
-    const targetPath =
-      redirectPath.startsWith('/admin') && loginUserRole !== 'admin' ? '/' : redirectPath
-    router.replace({
-      path: targetPath,
-      replace: true,
-    })
-  } else {
-    message.error('登录失败' + res.data.message)
+  try {
+    const res = await postUser(values)
+    // 登录成功，把登录状态保存到全局状态中
+    if (res.data.code === 0 && res.data.data) {
+      await loginUserStore.fetchLoginUser()
+      message.success('登录成功')
+      const redirectPath = getSafeRedirectPath()
+      const loginUserRole = loginUserStore.loginUser.userRole
+      const targetPath =
+        redirectPath.startsWith('/admin') && loginUserRole !== 'admin' ? '/' : redirectPath
+      router.replace({
+        path: targetPath,
+        replace: true,
+      })
+    } else {
+      message.error('登录失败：' + res.data.message)
+    }
+  } catch (error) {
+    message.error('登录失败：' + getErrorMessage(error))
   }
 }
 </script>

@@ -6,7 +6,11 @@
       :custom-request="handleUpload"
       :before-upload="beforeUpload"
     >
-      <img v-if="picture?.url" :src="resolveImageUrl(picture?.url)" alt="avatar" />
+      <img
+        v-if="picture?.url"
+        :src="getPictureFileUrl(picture?.id) ?? resolveImageUrl(picture?.url)"
+        alt="avatar"
+      />
       <div v-else>
         <loading-outlined v-if="loading"></loading-outlined>
         <plus-outlined v-else></plus-outlined>
@@ -21,7 +25,7 @@ import { LoadingOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import type { UploadFile, UploadProps } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
 import { postPictureUpload } from '@/api/picture'
-import { resolveImageUrl } from '@/utils'
+import { getPictureFileUrl, resolveImageUrl } from '@/utils'
 
 interface Props {
   picture?: API.PictureVO

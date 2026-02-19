@@ -130,14 +130,22 @@ const doSearch = () => {
 
 const doDelete = async (id?: number) => {
   if (!id) {
+    message.warning('请先选择用户')
     return
   }
-  const res = await postUserOpenApiDelete({ id })
-  if (res.data.code === 0) {
-    message.success('删除成功')
-    fetchData()
-  } else {
-    message.error('删除失败' + res.data.message)
+  try {
+    const res = await postUserOpenApiDelete({ id })
+    if (res.data.code === 0) {
+      message.success('删除成功')
+      fetchData()
+    } else {
+      message.error('删除失败，' + res.data.message)
+    }
+  } catch (error) {
+    const maybeResponse = (error as { response?: { data?: { message?: string } } })?.response
+    const errorMessage =
+      maybeResponse?.data?.message ?? (error instanceof Error ? error.message : String(error))
+    message.error('删除失败，' + errorMessage)
   }
 }
 </script>

@@ -5,10 +5,18 @@
     </h2>
     <!-- 空间信息表单 -->
     <a-form name="spaceForm" layout="vertical" :model="spaceForm" @finish="handleSubmit">
-      <a-form-item name="spaceName" label="空间名称">
+      <a-form-item
+        name="spaceName"
+        label="空间名称"
+        :rules="[{ required: true, message: '请输入空间名称' }]"
+      >
         <a-input v-model:value="spaceForm.spaceName" placeholder="请输入空间" allow-clear />
       </a-form-item>
-      <a-form-item name="spaceLevel" label="空间级别">
+      <a-form-item
+        name="spaceLevel"
+        label="空间级别"
+        :rules="[{ required: true, message: '请选择空间级别' }]"
+      >
         <a-select
           v-model:value="spaceForm.spaceLevel"
           style="min-width: 180px"
@@ -66,6 +74,13 @@ const spaceType = computed(() => {
 })
 
 const spaceLevelList = ref<API.SpaceLevel[]>([])
+const getApiErrorMessage = (error: unknown) => {
+  const maybeResponse = (error as { response?: { data?: { message?: string } } })?.response
+  return maybeResponse?.data?.message
+}
+const getErrorMessage = (error: unknown) => {
+  return getApiErrorMessage(error) ?? (error instanceof Error ? error.message : String(error))
+}
 
 // 获取空间级别
 const fetchSpaceLevelList = async () => {
@@ -88,33 +103,50 @@ const router = useRouter()
  * @param values
  */
 const handleSubmit = async () => {
+  const normalizedSpaceName = spaceForm.spaceName?.trim()
+  if (!normalizedSpaceName) {
+    message.warning('请输入空间名称')
+    return
+  }
+  if (spaceForm.spaceLevel === undefined || spaceForm.spaceLevel === null) {
+    message.warning('请选择空间级别')
+    return
+  }
+
   const spaceId = space.value?.id
   loading.value = true
-  let res
-  if (spaceId) {
-    // 更新
-    res = await postSpaceUpdate({
-      id: spaceId,
-      ...spaceForm,
-    })
-  } else {
-    // 创建
-    res = await postSpaceAdd({
-      ...spaceForm,
-      spaceType: spaceType.value,
-    })
+  try {
+    let res
+    if (spaceId) {
+      // 更新
+      res = await postSpaceUpdate({
+        id: spaceId,
+        ...spaceForm,
+        spaceName: normalizedSpaceName,
+      })
+    } else {
+      // 创建
+      res = await postSpaceAdd({
+        ...spaceForm,
+        spaceName: normalizedSpaceName,
+        spaceType: spaceType.value,
+      })
+    }
+    // 操作成功
+    if (res.data.code === 0 && res.data.data) {
+      message.success('操作成功')
+      // 跳转到空间详情页
+      router.push({
+        path: `/space/${res.data.data}`,
+      })
+    } else {
+      message.error('操作失败，' + res.data.message)
+    }
+  } catch (error) {
+    message.error('操作失败，' + getErrorMessage(error))
+  } finally {
+    loading.value = false
   }
-  // 操作成功
-  if (res.data.code === 0 && res.data.data) {
-    message.success('操作成功')
-    // 跳转到空间详情页
-    router.push({
-      path: `/space/${res.data.data}`,
-    })
-  } else {
-    message.error('操作失败，' + res.data.message)
-  }
-  loading.value = false
 }
 
 // 获取老数据

@@ -6,10 +6,10 @@
     :footer="false"
     @cancel="closeModal"
   >
-    <a-row gutter="16">
+    <a-row :gutter="16">
       <a-col span="12">
         <h4>原始图片</h4>
-        <img :src="resolveImageUrl(picture?.url)" :alt="picture?.name" style="max-width: 100%" />
+        <img :src="sourceImageUrl" :alt="picture?.name" style="max-width: 100%" />
       </a-col>
       <a-col span="12">
         <h4>扩图结果</h4>
@@ -32,14 +32,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import {
   postPictureOutPaintingCreateTask,
   getPictureOutPaintingGetTask,
   postPictureUploadUrl,
 } from '@/api/picture'
 import { message } from 'ant-design-vue'
-import { resolveImageUrl } from '@/utils'
+import { getPictureFileUrl, resolveImageUrl } from '@/utils'
 
 interface Props {
   picture?: API.PictureVO
@@ -48,6 +48,9 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const sourceImageUrl = computed(() => {
+  return getPictureFileUrl(props.picture?.id) ?? resolveImageUrl(props.picture?.url)
+})
 
 const resultImageUrl = ref<string>('')
 
@@ -59,24 +62,30 @@ const taskId = ref<string | null>(null)
  */
 const createTask = async () => {
   if (!props.picture?.id) {
+    message.warning('请先上传图片')
     return
   }
-  const res = await postPictureOutPaintingCreateTask({
-    pictureId: props.picture.id,
-    // 根据需要设置扩图参数
-    parameters: {
-      xScale: 2,
-      yScale: 2,
-    },
-  })
-  if (res.data.code === 0 && res.data.data) {
-    message.success('创建任务成功，请耐心等待，不要退出界面')
-    console.log(res.data.data.output.taskId)
-    taskId.value = res.data.data.output.taskId
-    // 开启轮询
-    startPolling()
-  } else {
-    message.error('图片任务失败，' + res.data.message)
+  try {
+    const res = await postPictureOutPaintingCreateTask({
+      pictureId: props.picture.id,
+      // 根据需要设置扩图参数
+      parameters: {
+        xScale: 2,
+        yScale: 2,
+      },
+    })
+    if (res.data.code === 0 && res.data.data) {
+      resultImageUrl.value = ''
+      message.success('创建任务成功，请耐心等待，不要退出界面')
+      taskId.value = res.data.data.output.taskId
+      // 开启轮询
+      startPolling()
+    } else {
+      message.error('图片任务失败，' + res.data.message)
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    message.error('图片任务失败，' + errorMessage)
   }
 }
 
@@ -177,6 +186,8 @@ const openModal = () => {
 // 关闭弹窗
 const closeModal = () => {
   visible.value = false
+  resultImageUrl.value = ''
+  clearPolling()
 }
 
 // 暴露函数给父组件

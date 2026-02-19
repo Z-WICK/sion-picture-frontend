@@ -41,7 +41,7 @@
           </template>
           <template v-if="column.dataIndex === 'spaceRole'">
             <a-select
-              v-model:value="record.spaceRole"
+              :value="record.spaceRole"
               :options="SPACE_ROLE_OPTIONS"
               @change="handleRoleChange($event, record)"
             />
@@ -51,7 +51,14 @@
           </template>
           <template v-else-if="column.key === 'action'">
             <a-space wrap>
-              <a-button type="link" danger @click="doDelete(record.id)">删除</a-button>
+              <a-button
+                type="link"
+                danger
+                :disabled="isLastAdmin(record)"
+                @click="doDelete(record.id, record)"
+              >
+                删除
+              </a-button>
             </a-space>
           </template>
         </template>
@@ -160,6 +167,13 @@ onMounted(() => {
 
 // 添加成员表单
 const formData = reactive<API.SpaceUserAddRequest>({})
+const isAdminRole = (spaceRole?: string) => spaceRole === 'admin'
+const getAdminCount = () => {
+  return dataList.value.filter((item) => isAdminRole(item.spaceRole)).length
+}
+const isLastAdmin = (record: API.SpaceUserVO) => {
+  return isAdminRole(record.spaceRole) && getAdminCount() <= 1
+}
 
 // 创建成员
 const handleSubmit = async () => {
@@ -193,8 +207,12 @@ const handleSubmit = async () => {
   }
 }
 
-const handleRoleChange = (value: string, record: API.SpaceUserVO) => {
-  editSpaceRole(value, record)
+const handleRoleChange = async (value: string, record: API.SpaceUserVO) => {
+  if (isAdminRole(record.spaceRole) && value !== 'admin' && isLastAdmin(record)) {
+    message.warning('至少保留一个管理员')
+    return
+  }
+  await editSpaceRole(value, record)
 }
 
 // 编辑成员角色
@@ -208,6 +226,7 @@ const editSpaceRole = async (value: string, record: API.SpaceUserVO) => {
       spaceRole: value,
     })
     if (res.data.code === 0) {
+      record.spaceRole = value
       message.success('修改成功')
     } else {
       message.error('修改失败，' + res.data.message)
@@ -223,12 +242,17 @@ const editSpaceRole = async (value: string, record: API.SpaceUserVO) => {
 }
 
 // 删除数据
-const doDelete = async (id?: number) => {
+const doDelete = async (id?: number, record?: API.SpaceUserVO) => {
   try {
     if (spaceNotFound.value) {
       return
     }
     if (!id) {
+      message.warning('成员不存在，无法删除')
+      return
+    }
+    if (record && isLastAdmin(record)) {
+      message.warning('至少保留一个管理员')
       return
     }
     const res = await postSpaceUserOpenApiDelete({ id })
@@ -237,7 +261,7 @@ const doDelete = async (id?: number) => {
       // 刷新数据
       fetchData()
     } else {
-      message.error('删除失败')
+      message.error('删除失败，' + res.data.message)
     }
   } catch (error) {
     if (isSpaceNotFoundError(error)) {

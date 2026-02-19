@@ -97,7 +97,7 @@ import {
 } from '@ant-design/icons-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { useRouter } from 'vue-router'
-import { downloadImage, formatSize, resolveImageUrl, toHexColor } from '@/utils'
+import { downloadImage, formatSize, getPictureFileUrl, resolveImageUrl, toHexColor } from '@/utils'
 import ShareModal from '@/components/ShareModal.vue'
 
 interface Props {
@@ -110,9 +110,18 @@ const pictureId = computed(() => {
   return Number.isNaN(id) ? undefined : id
 })
 const picture = ref<API.PictureVO>({})
-const pictureUrl = computed(() => resolveImageUrl(picture.value.url))
+const pictureUrl = computed(() => {
+  return getPictureFileUrl(picture.value.id) ?? resolveImageUrl(picture.value.url)
+})
 
 const loginUserStore = useLoginUserStore()
+const getApiErrorMessage = (error: unknown) => {
+  const maybeResponse = (error as { response?: { data?: { message?: string } } })?.response
+  return maybeResponse?.data?.message
+}
+const getErrorMessage = (error: unknown) => {
+  return getApiErrorMessage(error) ?? (error instanceof Error ? error.message : String(error))
+}
 
 // 是否具有编辑权限
 const canEdit = computed(() => {
@@ -141,8 +150,7 @@ const fetchPictureDetail = async () => {
       message.error('获取图片详情失败，' + res.data.message)
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    message.error('获取图片详情失败：' + errorMessage)
+    message.error('获取图片详情失败：' + getErrorMessage(error))
   }
 }
 
@@ -167,19 +175,26 @@ const doEdit = () => {
 const doDelete = async () => {
   const id = picture.value.id
   if (!id) {
+    message.warning('图片不存在，无法删除')
     return
   }
-  const res = await postPictureOpenApiDelete({ id })
-  if (res.data.code === 0) {
-    message.success('删除成功')
-  } else {
-    message.error('删除失败')
+  try {
+    const res = await postPictureOpenApiDelete({ id })
+    if (res.data.code === 0) {
+      message.success('删除成功')
+      await router.push('/')
+    } else {
+      message.error('删除失败，' + res.data.message)
+    }
+  } catch (error) {
+    message.error('删除失败，' + getErrorMessage(error))
   }
 }
 
 // 下载图片
 const doDownload = () => {
-  downloadImage(pictureUrl.value)
+  const downloadUrl = getPictureFileUrl(picture.value.id, true) ?? pictureUrl.value
+  void downloadImage(downloadUrl, picture.value.name ?? undefined)
 }
 
 // ----- 分享操作 ----

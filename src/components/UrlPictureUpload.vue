@@ -11,7 +11,11 @@
       </a-button>
     </a-input-group>
     <div class="img-wrapper">
-      <img v-if="picture?.url" :src="resolveImageUrl(picture?.url)" alt="avatar" />
+      <img
+        v-if="picture?.url"
+        :src="getPictureFileUrl(picture?.id) ?? resolveImageUrl(picture?.url)"
+        alt="avatar"
+      />
     </div>
   </div>
 </template>
@@ -19,7 +23,7 @@
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import { postPictureUploadUrl } from '@/api/picture'
-import { resolveImageUrl } from '@/utils'
+import { getPictureFileUrl, resolveImageUrl } from '@/utils'
 
 interface Props {
   picture?: API.PictureVO
@@ -30,15 +34,28 @@ interface Props {
 const props = defineProps<Props>()
 const fileUrl = ref<string>()
 const loading = ref<boolean>(false)
+const getApiErrorMessage = (error: unknown) => {
+  const maybeResponse = (error as { response?: { data?: { message?: string } } })?.response
+  return maybeResponse?.data?.message
+}
+const getErrorMessage = (error: unknown) => {
+  return getApiErrorMessage(error) ?? (error instanceof Error ? error.message : String(error))
+}
 
 /**
  * 上传图片
  * @param file
  */
 const handleUpload = async () => {
+  const normalizedFileUrl = fileUrl.value?.trim()
+  if (!normalizedFileUrl) {
+    message.warning('请输入图片地址')
+    return
+  }
+
   loading.value = true
   try {
-    const params: API.PictureUploadRequest = { fileUrl: fileUrl.value }
+    const params: API.PictureUploadRequest = { fileUrl: normalizedFileUrl }
     params.spaceId = props.spaceId
     if (props.picture) {
       params.id = props.picture.id
@@ -52,11 +69,11 @@ const handleUpload = async () => {
       message.error('图片上传失败，' + res.data.message)
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
     console.error('图片上传失败', error)
-    message.error('图片上传失败，' + errorMessage)
+    message.error('图片上传失败，' + getErrorMessage(error))
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 }
 </script>
 <style scoped>

@@ -16,11 +16,53 @@ export const formatSize = (size?: number) => {
  * @param url 图片下载地址
  * @param fileName 要保存为的文件名
  */
-export function downloadImage(url?: string, fileName?: string) {
+const getFileNameFromUrl = (url: string) => {
+  try {
+    const parsed = new URL(url, window.location.origin)
+    const pathName = parsed.pathname.split('/').pop()
+    return pathName || 'image'
+  } catch {
+    return 'image'
+  }
+}
+
+export async function downloadImage(url?: string, fileName?: string) {
   if (!url) {
     return
   }
-  saveAs(url, fileName)
+  try {
+    const res = await fetch(url, {
+      credentials: 'include',
+    })
+    if (!res.ok) {
+      throw new Error(`下载失败（HTTP ${res.status}）`)
+    }
+    const blob = await res.blob()
+    saveAs(blob, fileName || getFileNameFromUrl(url))
+  } catch {
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+}
+
+/**
+ * 获取同源图片文件接口地址
+ * @param pictureId 图片 id
+ * @param download 是否下载附件
+ */
+export const getPictureFileUrl = (
+  pictureId?: number | string,
+  download = false,
+): string | undefined => {
+  if (pictureId === undefined || pictureId === null || pictureId === '') {
+    return undefined
+  }
+  const searchParams = new URLSearchParams({
+    id: String(pictureId),
+  })
+  if (download) {
+    searchParams.set('download', 'true')
+  }
+  return `/api/picture/file?${searchParams.toString()}`
 }
 
 /**

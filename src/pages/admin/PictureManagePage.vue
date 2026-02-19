@@ -58,7 +58,7 @@
         </template>
         <template v-if="column.dataIndex === 'tags'">
           <a-space wrap>
-            <a-tag v-for="tag in JSON.parse(record.tags || '[]')" :key="tag">
+            <a-tag v-for="tag in parseTags(record.tags)" :key="tag">
               {{ tag }}
             </a-tag>
           </a-space>
@@ -68,7 +68,7 @@
           <div>宽度：{{ record.picWidth }}</div>
           <div>高度：{{ record.picHeight }}</div>
           <div>宽高比：{{ record.picScale }}</div>
-          <div>大小：{{ (record.picSize / 1024).toFixed(2) }}KB</div>
+          <div>大小：{{ formatSize(record.picSize) }}</div>
         </template>
         <template v-if="column.dataIndex === 'reviewMessage'">
           <div>审核状态：{{ PIC_REVIEW_STATUS_MAP[record.reviewStatus] }}</div>
@@ -126,7 +126,7 @@ import {
   PIC_REVIEW_STATUS_OPTIONS,
 } from '../../constants/picture.ts'
 import dayjs from 'dayjs'
-import { resolveImageUrl } from '@/utils'
+import { formatSize, resolveImageUrl } from '@/utils'
 
 const columns = [
   {
@@ -196,15 +196,22 @@ const searchParams = reactive<API.PictureQueryRequest>({
 
 // 获取数据
 const fetchData = async () => {
-  const res = await postPictureListPage({
-    ...searchParams,
-    nullSpaceId: true,
-  })
-  if (res.data.code === 0 && res.data.data) {
-    dataList.value = res.data.data.records ?? []
-    total.value = res.data.data.total ?? 0
-  } else {
-    message.error('获取数据失败，' + res.data.message)
+  try {
+    const res = await postPictureListPage({
+      ...searchParams,
+      nullSpaceId: true,
+    })
+    if (res.data.code === 0 && res.data.data) {
+      dataList.value = res.data.data.records ?? []
+      total.value = res.data.data.total ?? 0
+    } else {
+      message.error('获取数据失败，' + res.data.message)
+    }
+  } catch (error) {
+    const maybeResponse = (error as { response?: { data?: { message?: string } } })?.response
+    const errorMessage =
+      maybeResponse?.data?.message ?? (error instanceof Error ? error.message : String(error))
+    message.error('获取数据失败，' + errorMessage)
   }
 }
 
@@ -241,15 +248,23 @@ const doSearch = () => {
 // 删除数据
 const doDelete = async (id?: number) => {
   if (!id) {
+    message.warning('图片不存在，无法删除')
     return
   }
-  const res = await postPictureOpenApiDelete({ id })
-  if (res.data.code === 0) {
-    message.success('删除成功')
-    // 刷新数据
-    fetchData()
-  } else {
-    message.error('删除失败')
+  try {
+    const res = await postPictureOpenApiDelete({ id })
+    if (res.data.code === 0) {
+      message.success('删除成功')
+      // 刷新数据
+      fetchData()
+    } else {
+      message.error('删除失败，' + res.data.message)
+    }
+  } catch (error) {
+    const maybeResponse = (error as { response?: { data?: { message?: string } } })?.response
+    const errorMessage =
+      maybeResponse?.data?.message ?? (error instanceof Error ? error.message : String(error))
+    message.error('删除失败，' + errorMessage)
   }
 }
 
@@ -257,17 +272,55 @@ const doDelete = async (id?: number) => {
 const handleReview = async (record: API.Picture, reviewStatus: number) => {
   const reviewMessage =
     reviewStatus === PIC_REVIEW_STATUS_ENUM.PASS ? '管理员操作通过' : '管理员操作拒绝'
-  const res = await postPictureReview({
-    id: record.id,
-    reviewStatus,
-    reviewMessage,
-  })
-  if (res.data.code === 0) {
-    message.success('审核操作成功')
-    // 重新获取列表数据
-    fetchData()
-  } else {
-    message.error('审核操作失败，' + res.data.message)
+  try {
+    const res = await postPictureReview({
+      id: record.id,
+      reviewStatus,
+      reviewMessage,
+    })
+    if (res.data.code === 0) {
+      message.success('审核操作成功')
+      // 重新获取列表数据
+      fetchData()
+    } else {
+      message.error('审核操作失败，' + res.data.message)
+    }
+  } catch (error) {
+    const maybeResponse = (error as { response?: { data?: { message?: string } } })?.response
+    const errorMessage =
+      maybeResponse?.data?.message ?? (error instanceof Error ? error.message : String(error))
+    message.error('审核操作失败，' + errorMessage)
   }
+}
+
+const parseTags = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value
+      .map((tag) => String(tag).trim())
+      .filter(Boolean)
+  }
+  if (typeof value !== 'string') {
+    return []
+  }
+  const trimmed = value.trim()
+  if (!trimmed) {
+    return []
+  }
+  // 优先按 JSON 数组解析，兼容后端返回 `["a","b"]`
+  try {
+    const parsed = JSON.parse(trimmed)
+    if (Array.isArray(parsed)) {
+      return parsed
+        .map((tag) => String(tag).trim())
+        .filter(Boolean)
+    }
+  } catch {
+    // 非 JSON 时走下方兜底
+  }
+  // 兼容 `a,b` / `a，b` / `a b` 等普通字符串格式
+  return trimmed
+    .split(/[,\uFF0C\s]+/)
+    .map((tag) => tag.trim())
+    .filter(Boolean)
 }
 </script>
