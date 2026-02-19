@@ -107,6 +107,15 @@ const isNotFoundError = (error: unknown) => {
   const maybeResponse = (error as { response?: { status?: number; data?: { code?: number } } })?.response
   return maybeResponse?.status === 404 || maybeResponse?.data?.code === 40400
 }
+const isSpaceNotFoundMessage = (value?: string) => {
+  if (!value) {
+    return false
+  }
+  return value.includes('空间') && value.includes('不存在')
+}
+const isSpaceNotFoundError = (error: unknown) => {
+  return isNotFoundError(error) && isSpaceNotFoundMessage(getApiMessage(error))
+}
 const getErrorMessage = (error: unknown) => {
   return getApiMessage(error) ?? (error instanceof Error ? error.message : String(error))
 }
@@ -175,7 +184,7 @@ const handleSubmit = async () => {
       message.error('添加失败，' + res.data.message)
     }
   } catch (error) {
-    if (isNotFoundError(error)) {
+    if (isSpaceNotFoundError(error)) {
       spaceNotFound.value = true
       message.error(getApiMessage(error) ?? '空间不存在')
       return
@@ -204,7 +213,7 @@ const editSpaceRole = async (value: string, record: API.SpaceUserVO) => {
       message.error('修改失败，' + res.data.message)
     }
   } catch (error) {
-    if (isNotFoundError(error)) {
+    if (isSpaceNotFoundError(error)) {
       spaceNotFound.value = true
       message.error(getApiMessage(error) ?? '空间不存在')
       return
@@ -231,7 +240,7 @@ const doDelete = async (id?: number) => {
       message.error('删除失败')
     }
   } catch (error) {
-    if (isNotFoundError(error)) {
+    if (isSpaceNotFoundError(error)) {
       spaceNotFound.value = true
       message.error(getApiMessage(error) ?? '空间不存在')
       return
