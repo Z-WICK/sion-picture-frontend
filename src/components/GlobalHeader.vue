@@ -28,16 +28,18 @@
             </ASpace>
             <template #overlay>
               <a-menu>
+                <a-menu-item @click="goUserProfile">
+                  <UserOutlined />
+                  个人信息
+                </a-menu-item>
                 <a-menu-item @click="doLogout">
                   <LogoutOutlined />
                   退出登录
                 </a-menu-item>
-                <a-menu-item>
-                  <router-link to="/my_space"/>
+                <a-menu-item @click="goMySpace">
                   <UserOutlined />
                   我的空间
                 </a-menu-item>
-
               </a-menu>
             </template>
           </a-dropdown>
@@ -79,7 +81,6 @@ router.afterEach((to) => {
 //用户注销
 const doLogout = async () => {
   const res = await postUserLogout()
-  console.log(res)
   if (res.data.code === 0) {
     loginUserStore.setLoginUser({
       userName: '未登录',
@@ -89,6 +90,14 @@ const doLogout = async () => {
   } else {
     message.error('退出登录失败' + res.data.message)
   }
+}
+
+const goUserProfile = async () => {
+  await router.push('/user/profile')
+}
+
+const goMySpace = async () => {
+  await router.push('/my_space')
 }
 // 菜单列表
 const originItems = [
