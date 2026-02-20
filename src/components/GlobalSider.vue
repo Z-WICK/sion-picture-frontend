@@ -37,7 +37,7 @@ const loginUserStore = useLoginUserStore()
 // 固定的菜单列表
 const fixedMenuItems = [
   {
-    key: '/',
+    key: '/gallery',
     icon: () => h(PictureOutlined),
     label: '公共图库',
   },

@@ -1,18 +1,38 @@
 <template>
   <div id="app">
-    <BasicLayout />
+    <router-view v-if="isBlankLayout" />
+    <LazyBasicLayout v-else />
   </div>
 </template>
 <script setup lang="ts">
-import BasicLayout from '@/layouts/BasicLayout.vue'
+import { computed, defineAsyncComponent, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { getHealth } from '@/api/health'
 
+const LazyBasicLayout = defineAsyncComponent(() => import('@/layouts/BasicLayout.vue'))
 const loginUserStore = useLoginUserStore()
-loginUserStore.fetchLoginUser()
+const route = useRoute()
+const isBlankLayout = computed(() => route.meta.layout === 'blank')
+const appReady = ref(false)
 
-getHealth().then((res) => {
-  console.log(res)
+const initMainApp = () => {
+  if (appReady.value) {
+    return
+  }
+  appReady.value = true
+  loginUserStore.fetchLoginUser()
+  getHealth().then((res) => {
+    console.log(res)
+  })
+}
+
+watch(isBlankLayout, (blank) => {
+  if (!blank) {
+    initMainApp()
+  }
+}, {
+  immediate: true,
 })
 
 </script>

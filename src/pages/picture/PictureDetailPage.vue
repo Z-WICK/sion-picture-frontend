@@ -179,7 +179,7 @@ const doDelete = async () => {
     const res = await postPictureOpenApiDelete({ id })
     if (res.data.code === 0) {
       message.success('删除成功')
-      await router.push('/')
+      await router.push('/gallery')
     } else {
       message.error('删除失败，' + res.data.message)
     }

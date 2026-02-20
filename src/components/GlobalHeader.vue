@@ -2,7 +2,7 @@
   <header id="globalHeader">
     <a-row class="header-row" :wrap="false" align="middle">
       <a-col flex="228px" class="brand-col">
-        <RouterLink to="/">
+        <RouterLink to="/gallery">
           <div class="title-bar">
             <img class="logo" src="../assets/logo.svg" alt="logo" />
             <div class="title">灵感之源</div>
@@ -105,7 +105,7 @@ const goMySpace = async () => {
 // 菜单列表
 const originItems = [
   {
-    key: '/',
+    key: '/gallery',
     icon: () => h(HomeOutlined),
     label: '主页',
     title: '主页',

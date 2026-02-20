@@ -54,7 +54,7 @@ const handleSubmit = async () => {
   if (res.data.code === 0 && res.data.data) {
     message.success(`创建成功，共${res.data.data}条`)
     router.push({
-      path: '/',
+      path: '/gallery',
     })
   } else {
     message.error('创建失败' + res.data.message)
