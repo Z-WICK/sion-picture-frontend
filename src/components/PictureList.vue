@@ -38,9 +38,9 @@
                 />
                 <div class="cover-meta-top">
                   <span class="cover-chip">{{ getPictureCategory(picture) }}</span>
-                  <span class="cover-chip cover-chip--soft">{{ getPictureRatioText(picture) }}</span>
+                  <span v-if="showCoverRatio" class="cover-chip cover-chip--soft">{{ getPictureRatioText(picture) }}</span>
                 </div>
-                <div class="cover-meta-bottom">
+                <div v-if="showCoverMetaBottom" class="cover-meta-bottom">
                   <span class="cover-chip cover-chip--dark">{{ getPictureSizeText(picture) }}</span>
                   <span class="cover-chip cover-chip--dark">{{ getPictureFormatText(picture) }}</span>
                 </div>
@@ -158,6 +158,14 @@ const isSingleResult = computed(
 const isDualResult = computed(
   () => !props.loading && props.dataList.length === 2,
 )
+const showCoverMetaBottom = computed(() => props.viewMode === 'comfortable' || props.spotlight)
+const showCoverRatio = computed(() => props.viewMode === 'comfortable' || props.spotlight || isSingleResult.value)
+const tagDisplayLimit = computed(() => {
+  if (props.spotlight) {
+    return 4
+  }
+  return props.viewMode === 'compact' ? 2 : 3
+})
 
 const listGrid = computed(() => {
   if (props.spotlight && isSparseResult.value) {
@@ -290,8 +298,9 @@ const normalizeTags = (value: unknown): string[] => {
     .map((tag) => tag.trim())
     .filter(Boolean)
 }
-const getDisplayTags = (picture: API.PictureVO) => normalizeTags(picture.tags).slice(0, 3)
-const getMoreTagCount = (picture: API.PictureVO) => Math.max(0, normalizeTags(picture.tags).length - 3)
+const getDisplayTags = (picture: API.PictureVO) => normalizeTags(picture.tags).slice(0, tagDisplayLimit.value)
+const getMoreTagCount = (picture: API.PictureVO) =>
+  Math.max(0, normalizeTags(picture.tags).length - tagDisplayLimit.value)
 const getPictureCategory = (picture: API.PictureVO) => {
   return picture.category?.trim() || '默认分类'
 }
@@ -465,6 +474,9 @@ const doShare = (picture: API.PictureVO, e: MouseEvent) => {
 
 .cover-meta-bottom {
   bottom: 8px;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 0.24s ease, transform 0.24s ease;
 }
 
 .cover-chip {
@@ -508,6 +520,10 @@ const doShare = (picture: API.PictureVO, e: MouseEvent) => {
 
 .picture-list--compact .picture-tags {
   min-height: 24px;
+}
+
+.picture-list--compact .cover-chip {
+  font-size: 10px;
 }
 
 .picture-list--sparse :deep(.ant-row) {
@@ -573,6 +589,11 @@ const doShare = (picture: API.PictureVO, e: MouseEvent) => {
 
 .picture-list--spotlight :deep(.ant-card-body) {
   padding: 14px 16px 16px;
+}
+
+.picture-list--spotlight .cover-meta-bottom {
+  opacity: 1;
+  transform: none;
 }
 
 .picture-list--spotlight .picture-title {
@@ -653,6 +674,11 @@ const doShare = (picture: API.PictureVO, e: MouseEvent) => {
   opacity: 0.96;
 }
 
+.picture-card:hover .cover-meta-bottom {
+  opacity: 1;
+  transform: none;
+}
+
 .picture-card:focus-visible {
   box-shadow:
     0 0 0 3px rgb(93 124 157 / 22%),
@@ -706,7 +732,7 @@ const doShare = (picture: API.PictureVO, e: MouseEvent) => {
 
 .picture-list :deep(.ant-card-meta-description) {
   display: grid;
-  gap: 8px;
+  gap: 7px;
 }
 
 .picture-list :deep(.ant-card-actions) {
@@ -720,7 +746,7 @@ const doShare = (picture: API.PictureVO, e: MouseEvent) => {
 }
 
 .picture-list :deep(.ant-card-body) {
-  padding: 12px 13px 14px;
+  padding: 11px 12px 13px;
 }
 
 @keyframes picture-card-enter {
@@ -767,6 +793,7 @@ const doShare = (picture: API.PictureVO, e: MouseEvent) => {
   .picture-card,
   .picture-list :deep(.ant-list-item),
   .image-fixed-180,
+  .cover-meta-bottom,
   .cover-sheen,
   .action-btn {
     transition: none !important;

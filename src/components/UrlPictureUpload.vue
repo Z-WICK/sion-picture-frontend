@@ -1,15 +1,15 @@
 <template>
   <div class="url-picture-upload">
-    <a-input-group compact class="url-input-group">
+    <div class="url-input-row">
       <a-input
         v-model:value="fileUrl"
-        class="w-calc-url-input"
+        class="url-input"
         placeholder="请输入图片地址"
       />
-      <a-button type="primary" class="w-120" :loading="loading" @click="handleUpload">
-        提交
+      <a-button type="primary" class="url-submit" :loading="loading" @click="handleUpload">
+        上传
       </a-button>
-    </a-input-group>
+    </div>
     <div class="img-wrapper">
       <img
         v-if="picture?.url"
@@ -80,7 +80,21 @@ const handleUpload = async () => {
 .url-picture-upload {
   margin-bottom: 16px;
   display: grid;
-  gap: 16px;
+  gap: 12px;
+}
+
+.url-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.url-input {
+  min-width: 0;
+}
+
+.url-submit {
+  min-width: 88px;
 }
 
 .url-picture-upload img {
@@ -94,13 +108,13 @@ const handleUpload = async () => {
   text-align: center;
 }
 
-.url-picture-upload :deep(.url-input-group .ant-input) {
-  border-start-end-radius: 0 !important;
-  border-end-end-radius: 0 !important;
-}
+@media (max-width: 576px) {
+  .url-input-row {
+    grid-template-columns: 1fr;
+  }
 
-.url-picture-upload :deep(.url-input-group .ant-btn) {
-  border-start-start-radius: 0;
-  border-end-start-radius: 0;
+  .url-submit {
+    width: 100%;
+  }
 }
 </style>

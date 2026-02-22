@@ -1,6 +1,14 @@
 <template>
   <div id="homePage">
-    <section :class="['workspace-topbar', { 'workspace-topbar--compact': isSpotlightResult }]">
+    <section
+      :class="[
+        'workspace-topbar',
+        {
+          'workspace-topbar--compact': isSpotlightResult,
+          'workspace-topbar--quiet': shouldQuietTopbar,
+        },
+      ]"
+    >
       <div class="topbar-brief-row">
         <div class="topbar-brief-main">
           <p class="workspace-subtitle">
@@ -9,7 +17,11 @@
           </p>
           <h1 class="workspace-title">{{ hasActiveFilters ? '按你的条件探索图片' : '发现值得收藏的公开图片' }}</h1>
         </div>
-        <div class="topbar-kpi-strip" aria-label="图库概览">
+        <div v-if="shouldQuietTopbar" class="topbar-status-chip" aria-label="当前浏览状态">
+          <strong>{{ total }}</strong>
+          <span>{{ sortCaption }} · {{ viewModeLabel }}视图</span>
+        </div>
+        <div v-else class="topbar-kpi-strip" aria-label="图库概览">
           <span class="topbar-kpi">
             <strong>{{ total }}</strong>
             <span>公开图片</span>
@@ -25,7 +37,7 @@
         </div>
       </div>
 
-      <div :class="['topbar-control-row', { 'topbar-control-row--quiet': isSpotlightResult }]">
+      <div :class="['topbar-control-row', { 'topbar-control-row--quiet': isSpotlightResult || shouldQuietTopbar }]">
         <div class="topbar-search-shell">
           <div class="topbar-search">
             <a-input-search
@@ -43,7 +55,7 @@
           </a-button>
         </div>
 
-        <div :class="['topbar-actions', { 'topbar-actions--quiet': isSpotlightResult }]">
+        <div :class="['topbar-actions', { 'topbar-actions--quiet': isSpotlightResult || shouldQuietTopbar }]">
           <a-popover v-model:open="showDisplayPanel" trigger="click" placement="bottomRight">
             <template #content>
               <section class="display-panel" aria-label="显示设置">
@@ -102,7 +114,7 @@
             </a-button>
           </a-popover>
 
-          <a-dropdown>
+          <a-dropdown v-if="!shouldQuietTopbar && !isSpotlightResult">
             <a-button class="more-action-btn">
               更多
               <DownOutlined />
@@ -117,11 +129,14 @@
         </div>
       </div>
 
-      <div v-if="visibleHotCategoryChips.length || hasActiveFilters" class="topbar-context-row">
-        <div v-if="visibleHotCategoryChips.length" class="trend-strip" aria-label="当前页热点分类">
+      <div
+        v-if="displayHotCategoryChips.length || hasActiveFilters"
+        :class="['topbar-context-row', { 'topbar-context-row--quiet': shouldQuietTopbar }]"
+      >
+        <div v-if="displayHotCategoryChips.length" class="trend-strip" aria-label="当前页热点分类">
           <span class="trend-label">热点</span>
           <button
-            v-for="item in visibleHotCategoryChips"
+            v-for="item in displayHotCategoryChips"
             :key="item.name"
             type="button"
             class="trend-chip"
@@ -271,6 +286,14 @@
           </a-space>
         </div>
 
+        <div class="filter-summary-strip" aria-label="筛选概览">
+          <span class="summary-pill">
+            分类 {{ selectedCategory === 'all' ? '全部' : selectedCategory }}
+          </span>
+          <span class="summary-pill">标签 {{ activeTagCount }} 个</span>
+          <span class="summary-pill">结果 {{ total }} 张</span>
+        </div>
+
         <div class="filter-group fold-group">
           <button
             type="button"
@@ -285,6 +308,26 @@
             </span>
           </button>
           <div v-show="filterSectionOpen.category" class="fold-body">
+            <div class="category-quick-row">
+              <button
+                type="button"
+                class="drawer-chip-btn"
+                :class="{ 'is-active': selectedCategory === 'all' }"
+                @click="changeCategory('all')"
+              >
+                全部分类
+              </button>
+              <button
+                v-for="name in drawerCategoryOptions"
+                :key="`quick-${name}`"
+                type="button"
+                class="drawer-chip-btn"
+                :class="{ 'is-active': selectedCategory === name }"
+                @click="changeCategory(name)"
+              >
+                {{ name }}
+              </button>
+            </div>
             <a-space :size="[0, 8]" wrap>
               <a-checkable-tag :checked="selectedCategory === 'all'" @change="changeCategory('all')">
                 全部
@@ -314,6 +357,24 @@
             </button>
           </div>
           <div v-show="filterSectionOpen.tag" class="fold-body">
+            <div class="tag-quick-row">
+              <button
+                type="button"
+                class="tag-quick-btn"
+                :disabled="filteredOrderedTagEntries.length === 0"
+                @click="selectTopFilteredTags"
+              >
+                选前 6
+              </button>
+              <button
+                type="button"
+                class="tag-quick-btn"
+                :disabled="activeTagCount === 0"
+                @click="clearTagSelection"
+              >
+                清空标签
+              </button>
+            </div>
             <div class="tag-filter-bar">
               <a-input
                 v-model:value="tagSearchText"
@@ -322,16 +383,18 @@
               />
               <span class="tag-filter-meta">{{ filteredOrderedTagEntries.length }}/{{ tagList.length }}</span>
             </div>
-            <a-space :size="[0, 8]" wrap>
-              <a-checkable-tag
-                v-for="tagEntry in filteredOrderedTagEntries"
-                :key="tagEntry.tag"
-                v-model:checked="selectedTagList[tagEntry.index]"
-                @change="doSearch"
-              >
-                {{ tagEntry.tag }}
-              </a-checkable-tag>
-            </a-space>
+            <div class="tag-list-wrap">
+              <a-space :size="[0, 8]" wrap>
+                <a-checkable-tag
+                  v-for="tagEntry in filteredOrderedTagEntries"
+                  :key="tagEntry.tag"
+                  v-model:checked="selectedTagList[tagEntry.index]"
+                  @change="doSearch"
+                >
+                  {{ tagEntry.tag }}
+                </a-checkable-tag>
+              </a-space>
+            </div>
             <p v-if="filteredOrderedTagEntries.length === 0" class="tag-empty">
               没有匹配的标签
             </p>
@@ -438,6 +501,13 @@ const hasActiveFilters = computed(
     Boolean(searchParams.searchText?.trim()) ||
     selectedCategory.value !== 'all' ||
     selectedTagNames.value.length > 0,
+)
+const shouldQuietTopbar = computed(
+  () =>
+    !loading.value &&
+    !hasActiveFilters.value &&
+    visibleResultCount.value >= 8 &&
+    selectedCategory.value === 'all',
 )
 const sortCaption = computed(() =>
   sortKey.value === 'earliest'
@@ -569,6 +639,14 @@ const hotCategoryChips = computed(() => {
 const visibleHotCategoryChips = computed(() =>
   hotCategoryChips.value.length <= 1 ? [] : hotCategoryChips.value,
 )
+const displayHotCategoryChips = computed(() =>
+  shouldQuietTopbar.value ? visibleHotCategoryChips.value.slice(0, 3) : visibleHotCategoryChips.value,
+)
+const drawerCategoryOptions = computed(() => {
+  const hotNames = visibleHotCategoryChips.value.map((item) => item.name)
+  const base = hotNames.length > 0 ? hotNames : categoryList.value
+  return Array.from(new Set(base)).slice(0, 8)
+})
 const galleryStageStyle = computed(() => ({
   '--spotlight-x': `${gallerySpotlightX.value}%`,
   '--spotlight-y': `${gallerySpotlightY.value}%`,
@@ -784,6 +862,23 @@ const toggleFilterSection = (section: keyof typeof filterSectionOpen) => {
   filterSectionOpen[section] = !filterSectionOpen[section]
 }
 
+const clearTagSelection = () => {
+  selectedTagList.value = tagList.value.map(() => false)
+  doSearch()
+}
+
+const selectTopFilteredTags = () => {
+  if (filteredOrderedTagEntries.value.length === 0) {
+    return
+  }
+  const nextSelected = tagList.value.map((_, index) => Boolean(selectedTagList.value[index]))
+  filteredOrderedTagEntries.value.slice(0, 6).forEach((item) => {
+    nextSelected[item.index] = true
+  })
+  selectedTagList.value = nextSelected
+  doSearch()
+}
+
 const clearFilters = () => {
   searchParams.searchText = ''
   selectedCategory.value = 'all'
@@ -932,6 +1027,25 @@ onMounted(async () => {
   gap: 8px;
 }
 
+.workspace-topbar--quiet {
+  padding: 10px;
+  gap: 8px;
+  border-color: #d7e3ef;
+  box-shadow: 0 4px 12px rgb(33 51 73 / 5%);
+}
+
+.workspace-topbar--quiet .topbar-kpi-strip {
+  opacity: 0.72;
+}
+
+.workspace-topbar--quiet .display-action-caption {
+  display: none;
+}
+
+.workspace-topbar--quiet .topbar-control-row::after {
+  opacity: 0.55;
+}
+
 .workspace-topbar::before {
   content: '';
   position: absolute;
@@ -1016,6 +1130,28 @@ onMounted(async () => {
   justify-content: flex-end;
 }
 
+.topbar-status-chip {
+  min-height: 24px;
+  border-radius: 999px;
+  border: 1px solid #d2dfec;
+  background: linear-gradient(180deg, #ffffff 0%, #edf4fc 100%);
+  padding: 2px 10px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: #546d87;
+}
+
+.topbar-status-chip strong {
+  font-size: 13px;
+  line-height: 1.1;
+  color: #203950;
+}
+
+.topbar-status-chip span {
+  font-size: 10px;
+}
+
 .topbar-kpi {
   min-height: 24px;
   border-radius: 999px;
@@ -1045,7 +1181,7 @@ onMounted(async () => {
 
 .topbar-control-row {
   display: grid;
-  grid-template-columns: minmax(220px, 460px) minmax(0, 1fr);
+  grid-template-columns: minmax(220px, 460px) auto;
   align-items: center;
   gap: 6px;
   padding: 3px;
@@ -1063,6 +1199,14 @@ onMounted(async () => {
   border-color: #dde7f2;
   background: linear-gradient(180deg, rgb(255 255 255 / 82%) 0%, rgb(245 249 254 / 80%) 100%);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 68%);
+}
+
+.workspace-topbar--quiet .topbar-control-row {
+  border-color: #dfe8f3;
+  background: linear-gradient(180deg, rgb(255 255 255 / 78%) 0%, rgb(247 251 255 / 78%) 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 74%),
+    0 1px 5px rgb(40 61 87 / 4%);
 }
 
 .workspace-topbar--compact .topbar-kpi-strip,
@@ -1095,7 +1239,7 @@ onMounted(async () => {
 .topbar-actions {
   display: inline-flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 5px;
   flex-wrap: wrap;
   min-height: 28px;
@@ -1258,6 +1402,10 @@ onMounted(async () => {
   gap: 6px;
 }
 
+.topbar-context-row--quiet {
+  gap: 4px;
+}
+
 .active-filter-strip {
   min-height: 32px;
   border-radius: 10px;
@@ -1334,6 +1482,18 @@ onMounted(async () => {
   border-color: #8fa9c5;
   background: #dfeaf6;
   color: #233c57;
+}
+
+.topbar-context-row--quiet .trend-strip,
+.topbar-context-row--quiet .active-filter-strip {
+  min-height: 30px;
+  padding: 4px 7px;
+}
+
+.topbar-context-row--quiet .trend-chip {
+  min-height: 20px;
+  font-size: 10px;
+  padding-inline: 7px;
 }
 
 .active-filter-strip::-webkit-scrollbar,
@@ -1916,6 +2076,25 @@ onMounted(async () => {
   margin-top: 2px;
 }
 
+.filter-summary-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.summary-pill {
+  min-height: 24px;
+  border-radius: 999px;
+  border: 1px solid #d0dce9;
+  background: linear-gradient(180deg, #ffffff 0%, #edf4fb 100%);
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  color: #5c748f;
+  font-size: 11px;
+}
+
 .fold-group {
   border: 1px solid #e1ebf6;
   border-radius: 10px;
@@ -1963,6 +2142,70 @@ onMounted(async () => {
   margin-top: 8px;
 }
 
+.category-quick-row {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.drawer-chip-btn {
+  min-height: 26px;
+  border-radius: 999px;
+  border: 1px solid #d0dce9;
+  background: linear-gradient(180deg, #ffffff 0%, #edf4fb 100%);
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  color: #4f6984;
+  font-size: 11px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.drawer-chip-btn:hover {
+  border-color: #a5bdd5;
+  color: #26435f;
+}
+
+.drawer-chip-btn.is-active {
+  border-color: #9ab2cb;
+  background: #e3edf8;
+  color: #25425f;
+  font-weight: 600;
+}
+
+.tag-quick-row {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tag-quick-btn {
+  min-height: 26px;
+  border-radius: 999px;
+  border: 1px solid #cfdceb;
+  background: linear-gradient(180deg, #ffffff 0%, #edf4fc 100%);
+  padding: 0 10px;
+  color: #4e6782;
+  font-size: 11px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.tag-quick-btn:hover {
+  border-color: #a5bdd5;
+  color: #25425f;
+}
+
+.tag-quick-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .tag-filter-bar {
   margin-bottom: 8px;
   display: flex;
@@ -1980,6 +2223,13 @@ onMounted(async () => {
   margin: 8px 0 0;
   font-size: 13px;
   color: var(--text-subtle);
+}
+
+.tag-list-wrap {
+  max-height: min(280px, 36vh);
+  overflow: auto;
+  padding-right: 2px;
+  scrollbar-width: thin;
 }
 
 .tag-meta,

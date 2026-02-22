@@ -1,210 +1,421 @@
 <template>
   <div id="userRegisterPage">
-    <div class="register-shell">
-      <section class="intro-panel">
-        <p class="eyebrow">Sion Picture</p>
-        <h1 class="headline">创建你的协作空间</h1>
-        <p class="summary">注册后可创建个人与团队图库，集中管理素材并与成员共享工作成果。</p>
-        <ul class="feature-list">
-          <li>
-            <SafetyCertificateOutlined />
-            账号安全与访问控制
-          </li>
-          <li>
-            <UserAddOutlined />
-            新用户快速引导
-          </li>
-          <li>
-            <TeamOutlined />
-            团队空间协同管理
-          </li>
-        </ul>
-      </section>
+    <section class="auth-shell panel-card">
+      <span class="auth-glow auth-glow--primary" aria-hidden="true" />
+      <span class="auth-glow auth-glow--secondary" aria-hidden="true" />
 
-      <section class="form-panel">
-        <h2 class="title">账号注册</h2>
-        <p class="desc">填写信息后即可创建账户</p>
-        <a-form
-          :model="formState"
-          name="register"
-          autocomplete="off"
-          layout="vertical"
-          @finish="handleSubmit"
-        >
-          <a-form-item
-            label="账号"
-            name="userAccount"
-            :rules="[{ required: true, message: '请输入账号' }]"
-          >
-            <a-input v-model:value="formState.userAccount" placeholder="请输入账号" allow-clear />
-          </a-form-item>
-          <a-form-item
-            label="密码"
-            name="userPassword"
-            :rules="[
-              { required: true, message: '请输入密码' },
-              { min: 8, message: '密码不能小于 8 位' },
-            ]"
-          >
-            <a-input-password v-model:value="formState.userPassword" placeholder="请输入密码" />
-          </a-form-item>
-          <a-form-item
-            label="确认密码"
-            name="checkPassword"
-            :rules="[
-              { required: true, message: '请输入确认密码' },
-              { min: 8, message: '确认密码不能小于 8 位' },
-            ]"
-          >
-            <a-input-password v-model:value="formState.checkPassword" placeholder="请输入确认密码" />
-          </a-form-item>
-          <div class="tips">
-            已有账号？
-            <RouterLink class="login-link" to="/user/login">去登录</RouterLink>
+      <div class="auth-grid">
+        <section class="auth-story">
+          <p class="story-kicker">SION PICTURE ONBOARDING</p>
+          <h1 class="story-title">创建账户，开始你的图片资产库</h1>
+          <p class="story-subtitle">完成注册后即可创建个人与团队空间，统一沉淀项目素材。</p>
+
+          <div class="story-pill-row" aria-label="注册价值点">
+            <span class="story-pill">
+              <SafetyCertificateOutlined />
+              账号安全
+            </span>
+            <span class="story-pill">
+              <UserAddOutlined />
+              快速上手
+            </span>
+            <span class="story-pill">
+              <TeamOutlined />
+              团队共享
+            </span>
           </div>
-          <a-form-item class="submit-item">
-            <a-button type="primary" html-type="submit" block>注册</a-button>
-          </a-form-item>
-        </a-form>
-      </section>
-    </div>
+
+          <div class="story-roadmap" aria-label="完成注册后的步骤">
+            <article class="roadmap-item">
+              <span class="roadmap-index">01</span>
+              <div class="roadmap-body">
+                <p class="roadmap-title">创建账号</p>
+                <p class="roadmap-desc">设置账号与密码，建立身份。</p>
+              </div>
+            </article>
+            <article class="roadmap-item">
+              <span class="roadmap-index">02</span>
+              <div class="roadmap-body">
+                <p class="roadmap-title">创建空间</p>
+                <p class="roadmap-desc">按项目划分素材上下文和访问范围。</p>
+              </div>
+            </article>
+            <article class="roadmap-item">
+              <span class="roadmap-index">03</span>
+              <div class="roadmap-body">
+                <p class="roadmap-title">上传素材</p>
+                <p class="roadmap-desc">开始沉淀图片资产并持续复用。</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="story-actions">
+            <a-button ghost href="/" target="_blank">首页</a-button>
+            <a-button ghost href="/gallery" target="_blank">公开图库</a-button>
+            <a-button ghost :href="githubRepo" target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a-button>
+          </div>
+        </section>
+
+        <section class="auth-form">
+          <div class="form-header">
+            <p class="form-kicker">Create Account</p>
+            <h2 class="form-title">账号注册</h2>
+            <p class="form-subtitle">填写信息后即可创建账户。</p>
+          </div>
+
+          <div class="mini-kpi-row form-kpi-row">
+            <span class="mini-kpi">
+              <strong>{{ accountLength }}</strong>
+              <span>账号字符</span>
+            </span>
+            <span class="mini-kpi">
+              <strong>{{ passwordLength }}</strong>
+              <span>密码字符</span>
+            </span>
+            <span class="mini-kpi">
+              <strong>{{ passwordMatchState }}</strong>
+              <span>一致性</span>
+            </span>
+          </div>
+
+          <a-form
+            :model="formState"
+            name="register"
+            autocomplete="off"
+            layout="vertical"
+            @finish="handleSubmit"
+          >
+            <a-form-item
+              label="账号"
+              name="userAccount"
+              :rules="[{ required: true, message: '请输入账号' }]"
+            >
+              <a-input
+                v-model:value="formState.userAccount"
+                placeholder="请输入账号"
+                autocomplete="username"
+                allow-clear
+              />
+            </a-form-item>
+            <a-form-item
+              label="密码"
+              name="userPassword"
+              :rules="[
+                { required: true, message: '请输入密码' },
+                { min: 8, message: '密码不能小于 8 位' },
+              ]"
+            >
+              <a-input-password
+                v-model:value="formState.userPassword"
+                placeholder="请输入密码"
+                autocomplete="new-password"
+              />
+            </a-form-item>
+            <a-form-item
+              label="确认密码"
+              name="checkPassword"
+              :rules="[
+                { required: true, message: '请输入确认密码' },
+                { min: 8, message: '确认密码不能小于 8 位' },
+              ]"
+            >
+              <a-input-password
+                v-model:value="formState.checkPassword"
+                placeholder="请输入确认密码"
+                autocomplete="new-password"
+              />
+            </a-form-item>
+            <div class="form-footnote">
+              已有账号？
+              <RouterLink class="login-link" to="/user/login">立即登录</RouterLink>
+            </div>
+            <a-form-item class="submit-item">
+              <a-button type="primary" html-type="submit" block>
+                <template #icon>
+                  <ArrowRightOutlined />
+                </template>
+                创建账户
+              </a-button>
+            </a-form-item>
+          </a-form>
+        </section>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { postUserRegister } from '@/api/user'
-import { SafetyCertificateOutlined, TeamOutlined, UserAddOutlined } from '@ant-design/icons-vue'
+import {
+  ArrowRightOutlined,
+  SafetyCertificateOutlined,
+  TeamOutlined,
+  UserAddOutlined,
+} from '@ant-design/icons-vue'
+
+const githubRepo = 'https://github.com/Z-WICK/sion-picture-frontend'
 
 const formState = reactive<API.UserRegisterRequest>({
   userAccount: '',
   userPassword: '',
   checkPassword: '',
 })
+const accountLength = computed(() => formState.userAccount?.trim().length ?? 0)
+const passwordLength = computed(() => formState.userPassword?.length ?? 0)
+const passwordMatchState = computed(() => {
+  if (!formState.userPassword && !formState.checkPassword) {
+    return '待输入'
+  }
+  return formState.userPassword === formState.checkPassword ? '一致' : '不一致'
+})
 
-/**
- * 提交表单
- * @param values
- */
 const router = useRouter()
+const getApiErrorMessage = (error: unknown) => {
+  const maybeResponse = (error as { response?: { data?: { message?: string } } })?.response
+  return maybeResponse?.data?.message
+}
+const getErrorMessage = (error: unknown) => {
+  return getApiErrorMessage(error) ?? (error instanceof Error ? error.message : String(error))
+}
+
 const handleSubmit = async (values: API.UserRegisterRequest) => {
-  //判断两次输入的密码是否一致
   if (formState.userPassword !== formState.checkPassword) {
     message.error('两次输入的密码不一致')
     return
   }
-  const res = await postUserRegister(values)
-  // 注册成功，跳转到登录页面
-  if (res.data.code === 0 && res.data.data) {
-    message.success('注册成功')
-    router.push({
-      path: '/user/login',
-      replace: true,
-    })
-  } else {
-    message.error('注册失败' + res.data.message)
+  try {
+    const res = await postUserRegister(values)
+    if (res.data.code === 0 && res.data.data) {
+      message.success('注册成功')
+      router.push({
+        path: '/user/login',
+        replace: true,
+      })
+    } else {
+      message.error('注册失败' + res.data.message)
+    }
+  } catch (error) {
+    message.error('注册失败：' + getErrorMessage(error))
   }
 }
 </script>
 
 <style scoped>
 #userRegisterPage {
-  --page-bg-top: #f8fafd;
-  --page-bg-bottom: #ecf2f8;
-  --surface: #ffffff;
-  --line: #d4deea;
-  --text-main: #1f2d3d;
-  --text-subtle: #5d6f86;
-  --brand: #345375;
-  --brand-hover: #2a4563;
+  --line: #cfdceb;
+  --line-strong: #b7cadf;
+  --text-main: #1f3248;
+  --text-subtle: #5d738b;
+  --brand: #355273;
+  --brand-hover: #284562;
 
-  padding: 8px 0;
+  padding: 10px 0;
 }
 
-.register-shell {
-  max-width: 920px;
+.auth-shell {
+  max-width: 1120px;
   margin: 0 auto;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(126% 114% at 2% 0%, rgb(208 223 241 / 34%) 0%, transparent 58%),
+    radial-gradient(130% 118% at 96% 98%, rgb(231 240 251 / 42%) 0%, transparent 61%),
+    linear-gradient(180deg, #fcfeff 0%, #eef4fc 100%);
+}
+
+.auth-glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 999px;
+}
+
+.auth-glow--primary {
+  width: 290px;
+  height: 290px;
+  top: -150px;
+  left: -96px;
+  background: radial-gradient(circle, rgb(176 199 225 / 40%) 0%, rgb(176 199 225 / 0%) 70%);
+}
+
+.auth-glow--secondary {
+  width: 330px;
+  height: 330px;
+  right: -136px;
+  bottom: -186px;
+  background: radial-gradient(circle, rgb(173 197 223 / 40%) 0%, rgb(173 197 223 / 0%) 72%);
+}
+
+.auth-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: minmax(260px, 360px) minmax(320px, 460px);
-  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+  gap: 14px;
 }
 
-.intro-panel {
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background: linear-gradient(170deg, var(--page-bg-top) 0%, var(--page-bg-bottom) 100%);
-  padding: 28px 24px;
+.auth-story {
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 92%) 0%, rgb(237 245 253 / 92%) 100%);
+  padding: 20px;
+  display: grid;
+  align-content: start;
+  gap: 14px;
 }
 
-.eyebrow {
-  margin: 0 0 10px;
+.story-kicker {
+  margin: 0;
   font-size: 12px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--text-subtle);
+  color: #60768d;
 }
 
-.headline {
+.story-title {
   margin: 0;
   font-size: 30px;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+.story-subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-subtle);
+  max-width: 520px;
+}
+
+.story-pill-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.story-pill {
+  min-height: 32px;
+  border-radius: 999px;
+  border: 1px solid #c7d8eb;
+  background: linear-gradient(180deg, #ffffff 0%, #edf4fc 100%);
+  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #2d4968;
+  font-size: 12px;
+}
+
+.story-pill :deep(svg) {
+  font-size: 14px;
+  color: #3d5d80;
+}
+
+.story-roadmap {
+  display: grid;
+  gap: 8px;
+}
+
+.roadmap-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  border: 1px solid #ccdbeb;
+  border-radius: 11px;
+  background: rgb(247 251 255 / 94%);
+  padding: 10px;
+}
+
+.roadmap-index {
+  width: 30px;
+  min-height: 30px;
+  border-radius: 999px;
+  border: 1px solid #bcd0e6;
+  background: linear-gradient(180deg, #fefeff 0%, #e9f2fb 100%);
+  display: grid;
+  place-items: center;
+  color: #2f4d6f;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.roadmap-body {
+  display: grid;
+  gap: 2px;
+}
+
+.roadmap-title {
+  margin: 0;
+  color: #233d5a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.roadmap-desc {
+  margin: 0;
+  color: #627a92;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.story-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.auth-form {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background:
+    radial-gradient(132% 140% at 100% 0%, rgb(198 217 238 / 21%) 0%, transparent 58%),
+    linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
+  padding: 20px 18px 12px;
+  display: grid;
+  align-content: start;
+}
+
+.form-header {
+  margin-bottom: 12px;
+}
+
+.form-kicker {
+  margin: 0 0 6px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #647d95;
+}
+
+.form-title {
+  margin: 0;
+  font-size: 23px;
   line-height: 1.2;
   color: var(--text-main);
 }
 
-.summary {
-  margin: 12px 0 20px;
-  font-size: 15px;
-  line-height: 1.7;
+.form-subtitle {
+  margin: 6px 0 0;
   color: var(--text-subtle);
+  font-size: 13px;
 }
 
-.feature-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 10px;
+.form-kpi-row {
+  margin-bottom: 12px;
 }
 
-.feature-list li {
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid #ccdaea;
-  background: #f7faff;
-  color: #30485f;
-  border-radius: 12px;
-  padding: 9px 12px;
-}
-
-.feature-list li :deep(svg) {
-  color: #3e5f82;
-  font-size: 16px;
-}
-
-.form-panel {
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background: var(--surface);
-  padding: 24px 24px 10px;
-}
-
-.title {
-  margin: 0;
-  font-size: 24px;
-  color: var(--text-main);
-}
-
-.desc {
-  margin: 8px 0 18px;
-  color: var(--text-subtle);
-}
-
-.tips {
-  margin-bottom: 16px;
+.form-footnote {
+  margin-top: 2px;
+  margin-bottom: 14px;
   color: var(--text-subtle);
   font-size: 13px;
   text-align: right;
@@ -221,8 +432,8 @@ const handleSubmit = async (values: API.UserRegisterRequest) => {
 
 #userRegisterPage :deep(.ant-input),
 #userRegisterPage :deep(.ant-input-affix-wrapper) {
-  min-height: 44px;
-  border-radius: 12px;
+  min-height: 39px;
+  border-radius: 10px;
   border-color: #b8c9dc;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -239,8 +450,8 @@ const handleSubmit = async (values: API.UserRegisterRequest) => {
 }
 
 #userRegisterPage :deep(.ant-btn-primary) {
-  min-height: 44px;
-  border-radius: 12px;
+  min-height: 40px;
+  border-radius: 10px;
   background: var(--brand);
   border-color: var(--brand);
   font-weight: 600;
@@ -252,26 +463,38 @@ const handleSubmit = async (values: API.UserRegisterRequest) => {
   border-color: var(--brand-hover);
 }
 
-@media (max-width: 900px) {
-  .register-shell {
-    grid-template-columns: 1fr;
-    max-width: 520px;
+@media (max-width: 960px) {
+  .auth-shell {
+    max-width: 680px;
+    padding: 14px;
   }
 
-  .headline {
+  .auth-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .story-title {
     font-size: 26px;
   }
 }
 
 @media (max-width: 576px) {
-  .intro-panel,
-  .form-panel {
-    border-radius: 14px;
-    padding: 18px 16px;
+  .auth-shell {
+    padding: 10px;
   }
 
-  .headline {
+  .auth-story,
+  .auth-form {
+    padding: 14px 12px;
+  }
+
+  .story-title {
     font-size: 22px;
+  }
+
+  .story-pill {
+    flex: 1 1 110px;
+    justify-content: center;
   }
 }
 

@@ -6,25 +6,44 @@
           <img class="brand-logo" src="@/assets/logo.svg" alt="灵感之源 Logo" />
           <span class="brand-name">灵感之源</span>
         </div>
-        <div class="shell-nav" aria-label="产品能力速览">
+        <div class="shell-tags" aria-label="产品关键词">
           <span>Search</span>
           <span>Upload</span>
-          <span>Collaboration</span>
+          <span>Space</span>
         </div>
       </header>
 
       <section class="hero-grid">
         <section class="hero-main">
           <p class="hero-kicker">Image Workspace</p>
-          <h1 class="hero-title">
-            让图片资产管理不止可用，而是
-            <span class="title-accent">有秩序</span>
-            且
-            <span class="title-accent-soft">有美感</span>
-          </h1>
+          <h1 class="hero-title">把图片资产，变成可复用的创作系统</h1>
           <p class="hero-subtitle">
-            面向团队与个人的图片工作台。统一搜索、上传与空间协作流程，减少重复劳动，提升图片复用效率。
+            用统一的检索、上传和空间协作流程，减少重复整理，把更多时间留给内容创作本身。
           </p>
+
+          <div class="hero-highlight-strip" aria-label="核心能力摘要">
+            <article class="hero-highlight-item">
+              <SearchOutlined />
+              <div>
+                <p class="hero-highlight-title">检索路径清晰</p>
+                <p class="hero-highlight-text">关键词、分类、标签联动过滤</p>
+              </div>
+            </article>
+            <article class="hero-highlight-item">
+              <CloudUploadOutlined />
+              <div>
+                <p class="hero-highlight-title">上传流程统一</p>
+                <p class="hero-highlight-text">单图和批量入口保持一致</p>
+              </div>
+            </article>
+            <article class="hero-highlight-item">
+              <TeamOutlined />
+              <div>
+                <p class="hero-highlight-title">空间协作高效</p>
+                <p class="hero-highlight-text">个人与团队空间同一体验</p>
+              </div>
+            </article>
+          </div>
 
           <div class="hero-actions">
             <a-button type="primary" size="large" @click="enterSite">
@@ -45,52 +64,14 @@
             <span class="live-dot" aria-hidden="true" />
             {{ statsText }}
           </p>
-
-          <div class="stats-grid" aria-label="关键数据">
-            <article class="stat-chip">
-              <span class="stat-chip-label">Public Images</span>
-              <strong class="stat-chip-value">{{ displayStats.total }}</strong>
-            </article>
-            <article class="stat-chip">
-              <span class="stat-chip-label">Categories</span>
-              <strong class="stat-chip-value">{{ displayStats.categories }}</strong>
-            </article>
-            <article class="stat-chip">
-              <span class="stat-chip-label">Tags</span>
-              <strong class="stat-chip-value">{{ displayStats.tags }}</strong>
-            </article>
-          </div>
-
-          <div class="signal-row" aria-label="价值概览">
-            <article class="signal-card">
-              <PictureOutlined />
-              <div>
-                <p class="signal-label">图库检索</p>
-                <p class="signal-value">多维筛选与快速定位</p>
-              </div>
-            </article>
-            <article class="signal-card">
-              <CloudUploadOutlined />
-              <div>
-                <p class="signal-label">上传工作流</p>
-                <p class="signal-value">单图与批量处理并行</p>
-              </div>
-            </article>
-            <article class="signal-card">
-              <TeamOutlined />
-              <div>
-                <p class="signal-label">空间协作</p>
-                <p class="signal-value">个人与团队统一体验</p>
-              </div>
-            </article>
-          </div>
         </section>
 
-        <aside class="hero-side" aria-label="产品视觉预览">
-          <article class="showcase-card">
-            <p class="showcase-kicker">Workflow</p>
-            <h2 class="showcase-title">从分散管理，到统一中枢</h2>
-            <p class="showcase-subtitle">01 / 搜索 02 / 上传 03 / 协作</p>
+        <aside class="hero-side" aria-label="产品界面预览">
+          <article class="preview-card">
+            <div class="preview-head">
+              <p class="preview-kicker">Realtime Snapshot</p>
+              <h2 class="preview-title">公开图库概览</h2>
+            </div>
 
             <figure
               class="preview-frame"
@@ -107,7 +88,7 @@
                     /landing-preview-960.webp 960w,
                     /landing-preview.webp 1280w
                   "
-                  sizes="(max-width: 768px) 100vw, (max-width: 1140px) 46vw, 520px"
+                  sizes="(max-width: 860px) 100vw, 520px"
                 />
                 <img
                   src="/landing-preview.png"
@@ -119,60 +100,32 @@
                   fetchpriority="high"
                 />
               </picture>
+              <span class="preview-grid" aria-hidden="true" />
               <span class="preview-glare" :style="previewGlareStyle" aria-hidden="true" />
             </figure>
 
-            <div class="preview-badges">
-              <span class="badge-item">Unified Gallery</span>
-              <span class="badge-item">Batch Upload</span>
-              <span class="badge-item">Team Space</span>
+            <div class="stats-grid" aria-label="关键数据">
+              <article class="stat-chip">
+                <span class="stat-label">Public Images</span>
+                <strong class="stat-value">{{ displayStats.total }}</strong>
+              </article>
+              <article class="stat-chip">
+                <span class="stat-label">Categories</span>
+                <strong class="stat-value">{{ displayStats.categories }}</strong>
+              </article>
+              <article class="stat-chip">
+                <span class="stat-label">Tags</span>
+                <strong class="stat-value">{{ displayStats.tags }}</strong>
+              </article>
+            </div>
+
+            <div class="preview-links">
+              <a-button size="small" @click="enterSite">进入公开图库</a-button>
+              <a-button size="small" href="/add_picture" target="_blank">上传入口</a-button>
             </div>
           </article>
-
-          <blockquote class="pull-quote">
-            “更少的界面切换，意味着更多的创作时间。”
-          </blockquote>
         </aside>
       </section>
-
-      <section class="story-strip" aria-label="产品使用三步流程">
-        <div class="story-head">
-          <h2 class="story-title">三步完成图片工作流</h2>
-          <div class="story-progress" aria-hidden="true">
-            <span class="progress-dot is-active" />
-            <span class="progress-dot" />
-            <span class="progress-dot" />
-          </div>
-        </div>
-        <article class="story-step">
-          <span class="step-index">Chapter 01</span>
-          <h3 class="step-title">发现</h3>
-          <p class="step-text">通过关键词、分类与标签，在海量图库中快速定位候选图片。</p>
-          <a-button type="link" class="step-link" @click="goWithPreset('discover')">探索图片</a-button>
-        </article>
-        <article class="story-step">
-          <span class="step-index">Chapter 02</span>
-          <h3 class="step-title">整理</h3>
-          <p class="step-text">将单图或批量内容纳入统一资产流，补充信息并保持结构化。</p>
-          <a-button type="link" class="step-link" @click="goWithPreset('upload')">上传素材</a-button>
-        </article>
-        <article class="story-step">
-          <span class="step-index">Chapter 03</span>
-          <h3 class="step-title">协作</h3>
-          <p class="step-text">在个人和团队空间中共享图片，减少重复沟通和版本分散。</p>
-          <a-button type="link" class="step-link" @click="goWithPreset('space')">进入空间</a-button>
-        </article>
-      </section>
-
-      <footer class="shell-foot">
-        <span>Public Gallery</span>
-        <span class="dot" />
-        <span>Batch Upload</span>
-        <span class="dot" />
-        <span>Team Spaces</span>
-        <span class="dot" />
-        <span>Open Source</span>
-      </footer>
     </main>
   </div>
 </template>
@@ -183,7 +136,7 @@ import {
   ArrowRightOutlined,
   CloudUploadOutlined,
   GithubOutlined,
-  PictureOutlined,
+  SearchOutlined,
   TeamOutlined,
 } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
@@ -204,6 +157,7 @@ const displayStats = ref({
 })
 const statsLoaded = ref(false)
 const statsError = ref(false)
+
 const reduceMotion = ref(false)
 const tiltX = ref(0)
 const tiltY = ref(0)
@@ -216,12 +170,12 @@ const statsRafId = ref<number>()
 
 const statsText = computed(() => {
   if (!statsLoaded.value) {
-    return '公开图库数据加载中...'
+    return '正在同步公开图库数据...'
   }
   if (statsError.value) {
-    return '暂时无法获取实时数据，点击进入站点查看完整内容'
+    return '暂时无法获取实时数据，进入站点可查看完整内容'
   }
-  return `公开图库 ${new Intl.NumberFormat('zh-CN').format(publicStats.value.total)} 张 · ${publicStats.value.categories} 个分类 · ${publicStats.value.tags} 个标签`
+  return `已收录 ${new Intl.NumberFormat('zh-CN').format(publicStats.value.total)} 张公开图片 · ${publicStats.value.categories} 个分类 · ${publicStats.value.tags} 个标签`
 })
 
 const previewImageStyle = computed(() => {
@@ -229,7 +183,7 @@ const previewImageStyle = computed(() => {
     return {}
   }
   return {
-    transform: `scale(1.03) rotateX(${tiltY.value}deg) rotateY(${tiltX.value}deg)`,
+    transform: `scale(1.04) rotateX(${tiltY.value}deg) rotateY(${tiltX.value}deg)`,
   }
 })
 
@@ -238,21 +192,12 @@ const previewGlareStyle = computed(() => {
     return {}
   }
   return {
-    background: `radial-gradient(circle at ${glareX.value}% ${glareY.value}%, rgb(255 255 255 / 44%) 0%, rgb(255 255 255 / 0%) 58%)`,
+    background: `radial-gradient(circle at ${glareX.value}% ${glareY.value}%, rgb(255 255 255 / 50%) 0%, rgb(255 255 255 / 0%) 58%)`,
   }
 })
 
 const enterSite = () => {
   router.push('/gallery')
-}
-
-const goWithPreset = (scene: 'discover' | 'upload' | 'space') => {
-  router.push({
-    path: '/gallery',
-    query: {
-      scene,
-    },
-  })
 }
 
 const onPreviewMove = (event: MouseEvent) => {
@@ -275,8 +220,8 @@ const onPreviewMove = (event: MouseEvent) => {
     previewRafId.value = undefined
     const normalizedX = pointerX.value / 100
     const normalizedY = pointerY.value / 100
-    tiltX.value = (normalizedX - 0.5) * 8
-    tiltY.value = (0.5 - normalizedY) * 8
+    tiltX.value = (normalizedX - 0.5) * 7.5
+    tiltY.value = (0.5 - normalizedY) * 7.5
     glareX.value = pointerX.value
     glareY.value = pointerY.value
   })
@@ -304,8 +249,9 @@ const animateDisplayStats = () => {
     window.cancelAnimationFrame(statsRafId.value)
   }
   const start = performance.now()
-  const duration = 720
+  const duration = 680
   const target = { ...publicStats.value }
+
   const step = (now: number) => {
     const progress = Math.min((now - start) / duration, 1)
     const eased = 1 - Math.pow(1 - progress, 3)
@@ -321,6 +267,7 @@ const animateDisplayStats = () => {
       displayStats.value = target
     }
   }
+
   statsRafId.value = window.requestAnimationFrame(step)
 }
 
@@ -336,17 +283,20 @@ const fetchPublicStats = async () => {
       } as API.PictureQueryRequest & { nullSpaceId: boolean }),
       getPictureTagCategory(),
     ])
+
     if (listRes.data.code === 0 && listRes.data.data) {
       publicStats.value.total = listRes.data.data.total ?? 0
     } else {
       statsError.value = true
     }
+
     if (optionsRes.data.code === 0 && optionsRes.data.data) {
       publicStats.value.categories = optionsRes.data.data.categoryList?.length ?? 0
       publicStats.value.tags = optionsRes.data.data.tagList?.length ?? 0
     } else {
       statsError.value = true
     }
+
     animateDisplayStats()
   } catch {
     statsError.value = true
@@ -373,59 +323,51 @@ onBeforeUnmount(() => {
 
 <style scoped>
 #landingPage {
-  --page-bg-top: #f8fbff;
-  --page-bg-bottom: #eaf1f8;
+  --page-top: #f8fbff;
+  --page-bottom: #e9f1f8;
   --surface: #ffffff;
-  --line: #d4deea;
-  --line-strong: #b8c9db;
-  --text-main: #1f3147;
-  --text-subtle: #60748d;
+  --line: #cfdbea;
+  --line-strong: #b9cde1;
+  --text-main: #1c2f45;
+  --text-subtle: #5f748d;
   --brand: #355273;
   --brand-hover: #274562;
-  --brand-soft: #e8f0f9;
-  --brand-highlight: #6f8dad;
+  --brand-soft: #e4edf8;
 
   min-height: 100vh;
-  padding: 26px;
+  padding: clamp(16px, 2.8vw, 32px);
   display: grid;
   place-items: center;
   background:
-    radial-gradient(110% 120% at 0% 0%, rgb(255 255 255 / 90%) 0%, transparent 66%),
-    radial-gradient(120% 130% at 100% 100%, rgb(227 236 247 / 80%) 0%, transparent 62%),
-    linear-gradient(180deg, var(--page-bg-top) 0%, var(--page-bg-bottom) 100%);
-  font-family:
-    'Inter',
-    'Avenir Next',
-    'PingFang SC',
-    'Hiragino Sans GB',
-    'Microsoft YaHei',
-    sans-serif;
+    radial-gradient(120% 110% at 0% 0%, rgb(255 255 255 / 92%) 0%, transparent 62%),
+    radial-gradient(120% 120% at 100% 100%, rgb(224 236 248 / 84%) 0%, transparent 58%),
+    linear-gradient(180deg, var(--page-top) 0%, var(--page-bottom) 100%);
 }
 
 .landing-shell {
-  width: min(1140px, 100%);
+  width: min(1180px, 100%);
   border-radius: 30px;
   border: 1px solid var(--line);
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 96%) 0%, rgb(246 250 255 / 96%) 100%),
-    var(--surface);
-  box-shadow:
-    0 22px 44px rgb(32 49 71 / 12%),
-    inset 0 1px 0 rgb(255 255 255 / 88%);
-  padding: 34px;
+  padding: clamp(20px, 2.8vw, 36px);
   position: relative;
   overflow: hidden;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 95%) 0%, rgb(245 250 255 / 95%) 100%),
+    var(--surface);
+  box-shadow:
+    0 24px 48px rgb(28 47 69 / 13%),
+    inset 0 1px 0 rgb(255 255 255 / 90%);
 }
 
 .landing-shell::before {
   content: '';
   position: absolute;
-  right: -120px;
-  top: -120px;
-  width: 300px;
-  height: 300px;
+  width: 360px;
+  height: 360px;
+  right: -140px;
+  top: -140px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(80 122 167 / 18%) 0%, rgb(80 122 167 / 0%) 74%);
+  background: radial-gradient(circle, rgb(84 121 160 / 24%) 0%, rgb(84 121 160 / 0%) 72%);
   pointer-events: none;
 }
 
@@ -434,8 +376,8 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(120deg, rgb(255 255 255 / 0%) 45%, rgb(255 255 255 / 36%) 50%, rgb(255 255 255 / 0%) 55%),
-    repeating-linear-gradient(0deg, rgb(54 82 115 / 0.018) 0, rgb(54 82 115 / 0.018) 1px, transparent 1px, transparent 22px);
+    linear-gradient(115deg, rgb(255 255 255 / 0%) 44%, rgb(255 255 255 / 34%) 50%, rgb(255 255 255 / 0%) 56%),
+    repeating-linear-gradient(0deg, rgb(53 82 115 / 0.02) 0, rgb(53 82 115 / 0.02) 1px, transparent 1px, transparent 24px);
   mix-blend-mode: soft-light;
   pointer-events: none;
 }
@@ -444,10 +386,11 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding-inline: 2px;
+  gap: 10px;
   padding-bottom: 18px;
   border-bottom: 1px solid var(--line);
+  position: relative;
+  z-index: 1;
 }
 
 .brand-mark {
@@ -457,47 +400,48 @@ onBeforeUnmount(() => {
 }
 
 .brand-logo {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
 }
 
 .brand-name {
   font-size: 16px;
+  line-height: 1;
   font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--text-main);
 }
 
-.shell-nav {
+.shell-tags {
   display: inline-flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   flex-wrap: wrap;
 }
 
-.shell-nav span {
+.shell-tags span {
   min-height: 32px;
   padding: 6px 12px;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgb(255 255 255 / 84%) 0%, rgb(241 248 255 / 84%) 100%);
+  background: linear-gradient(180deg, rgb(255 255 255 / 86%) 0%, rgb(241 247 255 / 86%) 100%);
   color: var(--text-subtle);
   font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 90%);
 }
 
 .hero-grid {
-  margin-top: 28px;
+  margin-top: clamp(20px, 3vw, 34px);
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: 30px;
+  gap: clamp(18px, 2.4vw, 30px);
+  position: relative;
+  z-index: 1;
 }
 
 .hero-main {
-  min-width: 0;
-  position: relative;
-  z-index: 1;
+  align-self: center;
 }
 
 .hero-kicker {
@@ -510,47 +454,72 @@ onBeforeUnmount(() => {
 
 .hero-title {
   margin: 14px 0 0;
-  max-width: 13em;
+  max-width: 11.5em;
   font-family:
-    'Playfair Display',
-    'Noto Serif SC',
-    'Songti SC',
-    serif;
-  font-size: clamp(2.25rem, 5.9vw, 4.1rem);
-  line-height: 1.12;
-  letter-spacing: -0.015em;
+    'SF Pro Display',
+    'Avenir Next',
+    'PingFang SC',
+    'Hiragino Sans GB',
+    sans-serif;
+  font-size: clamp(2.2rem, 5.2vw, 4rem);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
   color: var(--text-main);
-}
-
-.title-accent {
-  color: #2d4f72;
-  background: linear-gradient(110deg, #2a4868 0%, #6386a9 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.title-accent-soft {
-  color: #4e7093;
-  background: linear-gradient(105deg, #3f6387 0%, #7fa5c8 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .hero-subtitle {
   margin: 18px 0 0;
-  max-width: 40em;
-  font-size: 17px;
-  line-height: 1.75;
+  max-width: 37em;
+  font-size: clamp(1rem, 1.2vw, 1.1rem);
+  line-height: 1.72;
+  color: var(--text-subtle);
+}
+
+.hero-highlight-strip {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.hero-highlight-item {
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  align-items: flex-start;
+  background:
+    radial-gradient(140% 120% at 100% 0%, rgb(138 166 193 / 12%) 0%, transparent 60%),
+    linear-gradient(180deg, rgb(255 255 255 / 90%) 0%, rgb(243 249 255 / 90%) 100%);
+}
+
+.hero-highlight-item :deep(.anticon) {
+  margin-top: 2px;
+  font-size: 15px;
+  color: #355273;
+}
+
+.hero-highlight-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.hero-highlight-text {
+  margin: 3px 0 0;
+  font-size: 11px;
+  line-height: 1.55;
   color: var(--text-subtle);
 }
 
 .hero-actions {
-  margin-top: 30px;
+  margin-top: 28px;
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 12px;
 }
 
 .hero-actions :deep(.ant-btn) {
@@ -559,6 +528,7 @@ onBeforeUnmount(() => {
   padding-inline: 24px;
   font-weight: 600;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
 }
 
 .hero-actions :deep(.ant-btn:hover) {
@@ -568,7 +538,7 @@ onBeforeUnmount(() => {
 .hero-actions :deep(.ant-btn-primary) {
   border-color: var(--brand);
   background: var(--brand);
-  box-shadow: 0 8px 20px rgb(53 82 115 / 25%);
+  box-shadow: 0 10px 20px rgb(53 82 115 / 24%);
 }
 
 .hero-actions :deep(.ant-btn-primary:hover),
@@ -578,511 +548,264 @@ onBeforeUnmount(() => {
 }
 
 .hero-actions :deep(.ant-btn:focus-visible) {
-  outline: 2px solid #6c8fb3;
+  outline: 2px solid #6e8eb1;
   outline-offset: 2px;
 }
 
 .live-stats {
-  margin: 12px 0 0;
-  color: var(--text-subtle);
-  font-size: 13px;
-  line-height: 1.6;
+  margin: 14px 0 0;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-subtle);
 }
 
 .live-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #3a5b7f;
-  animation: pulseDot 1.8s ease-in-out infinite;
+  background: #3e607f;
+  box-shadow: 0 0 0 0 rgb(62 96 127 / 36%);
+  animation: pulseDot 1.9s ease-in-out infinite;
 }
 
-.stats-grid {
-  margin-top: 14px;
-  max-width: 540px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+.hero-side {
+  min-width: 0;
 }
 
-.stat-chip {
+.preview-card {
   border: 1px solid var(--line);
-  border-radius: 14px;
-  min-height: 86px;
-  padding: 10px 12px;
+  border-radius: 24px;
+  padding: 16px;
   background:
-    radial-gradient(120% 120% at 100% 0%, rgb(112 143 176 / 14%) 0%, transparent 58%),
-    linear-gradient(180deg, rgb(255 255 255 / 84%) 0%, rgb(241 247 255 / 84%) 100%);
-  box-shadow:
-    0 8px 16px rgb(36 57 81 / 8%),
-    inset 0 1px 0 rgb(255 255 255 / 95%);
-  display: grid;
-  align-content: center;
-  gap: 8px;
-  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    radial-gradient(130% 120% at 100% 0%, rgb(89 128 168 / 16%) 0%, transparent 60%),
+    linear-gradient(180deg, rgb(255 255 255 / 90%) 0%, rgb(242 248 255 / 90%) 100%);
+  box-shadow: 0 14px 32px rgb(30 49 70 / 10%);
 }
 
-.stat-chip:hover {
-  transform: translateY(-2px);
-  border-color: var(--line-strong);
-  box-shadow:
-    0 12px 20px rgb(36 57 81 / 12%),
-    inset 0 1px 0 rgb(255 255 255 / 98%);
+.preview-head {
+  margin-bottom: 10px;
 }
 
-.stat-chip-label {
+.preview-kicker {
+  margin: 0;
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-subtle);
 }
 
-.stat-chip-value {
-  margin: 0;
-  font-size: clamp(1.32rem, 1.2vw + 0.95rem, 1.7rem);
-  line-height: 1;
-  letter-spacing: -0.01em;
-  color: var(--text-main);
-  font-variant-numeric: tabular-nums;
-}
-
-.signal-row {
-  margin-top: 18px;
-  display: grid;
-  gap: 10px;
-}
-
-.signal-card {
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 82%) 0%, rgb(242 248 255 / 82%) 100%),
-    rgb(255 255 255 / 74%);
-  min-height: 58px;
-  padding: 10px 12px;
-  display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
-  gap: 10px;
-  align-items: center;
-  box-shadow: 0 8px 16px rgb(36 57 81 / 8%);
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}
-
-.signal-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 22px rgb(36 57 81 / 12%);
-}
-
-.signal-card :deep(.anticon) {
-  color: #3a5b7f;
+.preview-title {
+  margin: 6px 0 0;
   font-size: 18px;
-}
-
-.signal-label {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-subtle);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.signal-value {
-  margin: 4px 0 0;
-  color: var(--text-main);
-  font-size: 14px;
-}
-
-.hero-side {
-  min-width: 0;
-  display: grid;
-  gap: 12px;
-  align-content: start;
-}
-
-.showcase-card {
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 94%) 0%, rgb(240 247 255 / 94%) 100%),
-    var(--surface);
-  padding: 16px;
-  box-shadow: 0 14px 26px rgb(32 49 71 / 10%);
-  position: relative;
-}
-
-.showcase-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  border: 1px solid rgb(255 255 255 / 45%);
-  pointer-events: none;
-}
-
-.showcase-kicker {
-  margin: 0;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-subtle);
-}
-
-.showcase-title {
-  margin: 8px 0 0;
-  font-size: 30px;
-  line-height: 1.18;
+  font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--text-main);
-}
-
-.showcase-subtitle {
-  margin: 10px 0 0;
-  color: var(--text-subtle);
-  font-size: 13px;
 }
 
 .preview-frame {
-  margin: 14px 0 0;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  overflow: hidden;
-  background: #ffffff;
-  box-shadow: 0 10px 20px rgb(31 45 61 / 11%);
+  margin: 0;
+  width: 100%;
+  aspect-ratio: 16 / 10;
   position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  background: #dbe6f2;
+  box-shadow:
+    0 14px 30px rgb(29 46 67 / 18%),
+    inset 0 1px 0 rgb(255 255 255 / 65%);
   perspective: 900px;
-  transform-style: preserve-3d;
 }
 
 .preview-frame:focus-visible {
-  outline: 2px solid var(--brand-highlight);
-  outline-offset: 3px;
+  outline: 2px solid #6e8eb1;
+  outline-offset: 2px;
 }
 
 .preview-image {
-  display: block;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  height: 100%;
   object-fit: cover;
-  object-position: top center;
-  transition: transform 220ms ease;
+  transform-origin: center;
+  transition: transform 0.22s ease;
   will-change: transform;
+}
+
+.preview-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 14%) 0%, rgb(255 255 255 / 0%) 44%),
+    repeating-linear-gradient(
+      90deg,
+      rgb(255 255 255 / 0.08) 0,
+      rgb(255 255 255 / 0.08) 1px,
+      transparent 1px,
+      transparent 44px
+    );
+  pointer-events: none;
 }
 
 .preview-glare {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  transition: background 120ms ease;
-  mix-blend-mode: screen;
 }
 
-.preview-badges {
+.stats-grid {
   margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.stat-chip {
+  min-height: 74px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  padding: 10px;
+  display: grid;
+  align-content: space-between;
+  background: linear-gradient(180deg, rgb(255 255 255 / 92%) 0%, rgb(238 245 253 / 92%) 100%);
+}
+
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-subtle);
+}
+
+.stat-value {
+  margin-top: 6px;
+  font-size: clamp(1.08rem, 2vw, 1.38rem);
+  line-height: 1;
+  color: var(--text-main);
+}
+
+.preview-links {
+  margin-top: 10px;
   display: flex;
+  align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.badge-item {
-  min-height: 30px;
-  padding: 5px 10px;
+.preview-links :deep(.ant-btn) {
+  min-height: 32px;
   border-radius: 999px;
-  border: 1px solid var(--line);
-  background: rgb(255 255 255 / 78%);
+  padding-inline: 12px;
   font-size: 12px;
-  color: var(--text-subtle);
-  letter-spacing: 0.03em;
 }
 
-.story-strip {
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px solid var(--line);
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.story-head {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 2px;
-  padding-inline: 2px;
-}
-
-.story-title {
-  margin: 0;
-  font-size: clamp(1.18rem, 1.3vw + 0.98rem, 1.5rem);
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-  color: var(--text-main);
-}
-
-.story-progress {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 6px 10px;
-  background: linear-gradient(180deg, rgb(255 255 255 / 86%) 0%, rgb(241 247 255 / 86%) 100%);
-}
-
-.progress-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #9db2c9;
-}
-
-.progress-dot.is-active {
-  width: 20px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #486b8f 0%, #7394b6 100%);
-}
-
-.story-step {
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 82%) 0%, rgb(242 248 255 / 82%) 100%),
-    rgb(255 255 255 / 74%);
-  padding: 14px;
-  min-height: 140px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 10px 18px rgb(36 57 81 / 8%);
-  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
-  animation: revealUp 0.45s ease-out both;
-}
-
-.story-step:hover {
-  transform: translateY(-2px);
-  border-color: var(--line-strong);
-  box-shadow: 0 14px 24px rgb(36 57 81 / 11%);
-}
-
-.story-step::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #4e7397 0%, #7e9fbe 100%);
-  opacity: 0.78;
-}
-
-.story-step:nth-of-type(1) {
-  animation-delay: 0.05s;
-}
-
-.story-step:nth-of-type(2) {
-  animation-delay: 0.12s;
-}
-
-.story-step:nth-of-type(3) {
-  animation-delay: 0.2s;
-}
-
-.step-index {
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-subtle);
-}
-
-.step-title {
-  margin: 8px 0 0;
-  color: var(--text-main);
-  font-size: 22px;
-  line-height: 1.2;
-}
-
-.step-text {
-  margin: 8px 0 0;
-  color: var(--text-subtle);
-  font-size: 14px;
-  line-height: 1.72;
-  flex: 1;
-}
-
-.step-link {
-  margin-top: 8px;
-  padding: 0;
-  min-height: 40px;
-  display: inline-flex;
-  align-items: center;
-  color: #355a7f;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-}
-
-.step-link:hover {
-  color: #274a6e;
-}
-
-.step-link:focus-visible {
-  outline: 2px solid var(--brand-highlight);
-  outline-offset: 2px;
-  border-radius: 10px;
-}
-
-.pull-quote {
-  margin: 0;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: rgb(255 255 255 / 78%);
-  padding: 12px 14px;
-  color: #2f4b69;
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-.shell-foot {
-  margin-top: 26px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-  color: var(--text-subtle);
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--line-strong);
-}
-
-@keyframes revealUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.preview-links :deep(.ant-btn:hover) {
+  transform: translateY(-1px);
 }
 
 @keyframes pulseDot {
   0% {
-    opacity: 0.45;
-    transform: scale(0.92);
+    box-shadow: 0 0 0 0 rgb(62 96 127 / 34%);
   }
-
-  50% {
-    opacity: 1;
-    transform: scale(1);
+  70% {
+    box-shadow: 0 0 0 8px rgb(62 96 127 / 0%);
   }
-
   100% {
-    opacity: 0.45;
-    transform: scale(0.92);
+    box-shadow: 0 0 0 0 rgb(62 96 127 / 0%);
   }
 }
 
-@media (max-width: 960px) {
-  .landing-shell {
-    padding: 24px;
-    border-radius: 22px;
+@media (max-width: 1080px) {
+  .hero-title {
+    max-width: 100%;
   }
 
+  .hero-highlight-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
   .hero-grid {
     grid-template-columns: 1fr;
-    gap: 22px;
-  }
-
-  .showcase-title {
-    font-size: 26px;
-  }
-
-  .stats-grid {
-    max-width: none;
-  }
-
-  .story-head {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .story-strip {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  #landingPage {
-    padding: 14px;
-  }
-
-  .landing-shell {
-    padding: 20px 16px;
-    border-radius: 18px;
-  }
-
-  .shell-top {
-    align-items: flex-start;
-    flex-direction: column;
   }
 
   .hero-subtitle {
-    font-size: 15px;
-    line-height: 1.68;
+    max-width: 100%;
   }
 
-  .hero-actions :deep(.ant-btn) {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .stat-chip:last-child {
-    grid-column: 1 / -1;
-  }
-
-  .story-step {
-    min-height: 0;
+  .preview-card {
+    margin-top: 2px;
   }
 }
 
-@media (max-width: 520px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 620px) {
+  #landingPage {
+    padding: 10px;
   }
 
-  .stat-chip:last-child {
-    grid-column: auto;
+  .landing-shell {
+    border-radius: 22px;
+    padding: 14px;
+  }
+
+  .shell-top {
+    padding-bottom: 12px;
+  }
+
+  .brand-name {
+    font-size: 15px;
+  }
+
+  .shell-tags {
+    display: none;
+  }
+
+  .hero-title {
+    font-size: clamp(1.9rem, 9vw, 2.35rem);
+  }
+
+  .hero-actions {
+    gap: 8px;
+  }
+
+  .hero-actions :deep(.ant-btn) {
+    min-height: 44px;
+    padding-inline: 18px;
+  }
+
+  .preview-links {
+    gap: 6px;
+  }
+
+  .preview-links :deep(.ant-btn) {
+    min-height: 30px;
+    padding-inline: 10px;
+    font-size: 11px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .stat-chip {
+    min-height: 68px;
+    padding: 8px;
+  }
+
+  .stat-value {
+    font-size: 1.02rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #landingPage :deep(*) {
-    transition: none !important;
-    animation: none !important;
-  }
-
-  .story-step {
-    animation: none !important;
-  }
-
+  .hero-actions :deep(.ant-btn),
+  .preview-image,
   .live-dot {
+    transition: none !important;
     animation: none !important;
   }
 }
