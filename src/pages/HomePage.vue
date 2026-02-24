@@ -49,14 +49,24 @@
               @search="doSearch"
             />
           </div>
-          <a-button class="filter-toggle-btn filter-toggle-btn--inline" @click="toggleFilterPanel">
+          <a-button
+            class="filter-toggle-btn filter-toggle-btn--inline"
+            :aria-expanded="showFilters"
+            aria-controls="discoverPanel"
+            aria-haspopup="dialog"
+            @click="toggleFilterPanel"
+          >
             筛选
             <span v-if="activeFilterCount" class="filter-count-badge">{{ activeFilterCount }}</span>
           </a-button>
         </div>
 
         <div :class="['topbar-actions', { 'topbar-actions--quiet': isSpotlightResult || shouldQuietTopbar }]">
-          <a-popover v-model:open="showDisplayPanel" trigger="click" placement="bottomRight">
+          <a-popover
+            v-model:open="showDisplayPanel"
+            trigger="click"
+            placement="bottomRight"
+          >
             <template #content>
               <section class="display-panel" aria-label="显示设置">
                 <div class="display-group">
@@ -107,7 +117,11 @@
                 </div>
               </section>
             </template>
-            <a-button class="display-action-btn">
+            <a-button
+              class="display-action-btn"
+              :aria-expanded="showDisplayPanel"
+              aria-haspopup="dialog"
+            >
               显示
               <span class="display-action-caption">{{ displayModeCaption }}</span>
               <DownOutlined />
@@ -789,27 +803,33 @@ const fetchData = async (options: { syncQuery?: boolean } = {}) => {
     await syncRouteQuery()
   }
   loading.value = true
-  const params = {
-    ...searchParams,
-    nullSpaceId: true,
-    tags: [] as string[],
-  }
-  if (selectedCategory.value !== 'all') {
-    params.category = selectedCategory.value
-  }
-  tagList.value.forEach((tag, index) => {
-    if (selectedTagList.value[index]) {
-      params.tags.push(tag)
+  try {
+    const params = {
+      ...searchParams,
+      nullSpaceId: true,
+      tags: [] as string[],
     }
-  })
-  const res = await postPictureListPageVo(params)
-  if (res.data.code === 0 && res.data.data) {
-    dataList.value = res.data.data.records ?? []
-    total.value = res.data.data.total ?? 0
-  } else {
-    message.error(`获取数据失败，${res.data.message}`)
+    if (selectedCategory.value !== 'all') {
+      params.category = selectedCategory.value
+    }
+    tagList.value.forEach((tag, index) => {
+      if (selectedTagList.value[index]) {
+        params.tags.push(tag)
+      }
+    })
+    const res = await postPictureListPageVo(params)
+    if (res.data.code === 0 && res.data.data) {
+      dataList.value = res.data.data.records ?? []
+      total.value = res.data.data.total ?? 0
+    } else {
+      message.error(`获取数据失败，${res.data.message}`)
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    message.error(`获取数据失败，${errorMessage}`)
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 }
 
 const onPageChange = (page: number, pageSize: number) => {
@@ -925,20 +945,25 @@ const goToPicture = (id: number | string | undefined) => {
 }
 
 const getTagCategoryOptions = async () => {
-  const res = await getPictureTagCategory()
-  if (res.data.code === 0 && res.data.data) {
-    tagList.value = res.data.data.tagList ?? []
-    categoryList.value = res.data.data.categoryList ?? []
-    selectedTagList.value = tagList.value.map(() => false)
-    applyPendingRouteTags()
-    if (
-      selectedCategory.value !== 'all' &&
-      !categoryList.value.includes(selectedCategory.value)
-    ) {
-      selectedCategory.value = 'all'
+  try {
+    const res = await getPictureTagCategory()
+    if (res.data.code === 0 && res.data.data) {
+      tagList.value = res.data.data.tagList ?? []
+      categoryList.value = res.data.data.categoryList ?? []
+      selectedTagList.value = tagList.value.map(() => false)
+      applyPendingRouteTags()
+      if (
+        selectedCategory.value !== 'all' &&
+        !categoryList.value.includes(selectedCategory.value)
+      ) {
+        selectedCategory.value = 'all'
+      }
+    } else {
+      message.error(`获取标签分类列表失败，${res.data?.message ?? '请稍后重试'}`)
     }
-  } else {
-    message.error(`获取标签分类列表失败，${res.data?.message ?? '请稍后重试'}`)
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    message.error(`获取标签分类列表失败，${errorMessage}`)
   }
 }
 
@@ -2473,6 +2498,14 @@ onMounted(async () => {
 }
 
 @media (max-width: 768px) {
+  .filter-toggle-btn,
+  .display-action-btn,
+  .more-action-btn,
+  .topbar-actions :deep(.ant-btn) {
+    min-height: 30px;
+    padding-inline: 10px;
+  }
+
   #homePage {
     padding: 0;
     border-radius: 0;

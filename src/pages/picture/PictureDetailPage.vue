@@ -27,12 +27,20 @@
             </template>
             编辑
           </a-button>
-          <a-button v-if="canEdit" danger @click="doDelete">
-            <template #icon>
-              <DeleteOutlined />
-            </template>
-            删除
-          </a-button>
+          <a-popconfirm
+            v-if="canEdit"
+            title="确认删除这张图片吗？"
+            ok-text="确认"
+            cancel-text="取消"
+            @confirm="doDelete"
+          >
+            <a-button danger :loading="deleting" :disabled="actionUnavailable || deleting">
+              <template #icon>
+                <DeleteOutlined />
+              </template>
+              删除
+            </a-button>
+          </a-popconfirm>
         </a-space>
       </div>
 
@@ -227,6 +235,7 @@ const canEdit = computed(() => {
 })
 const actionUnavailable = computed(() => !picture.value.id)
 const permissionLabel = computed(() => (canEdit.value ? '可编辑' : '只读'))
+const deleting = ref(false)
 
 const fetchPictureDetail = async () => {
   try {
@@ -268,6 +277,10 @@ const doDelete = async () => {
     message.warning('图片不存在，无法删除')
     return
   }
+  if (deleting.value) {
+    return
+  }
+  deleting.value = true
   try {
     const res = await postPictureOpenApiDelete({ id })
     if (res.data.code === 0) {
@@ -278,6 +291,8 @@ const doDelete = async () => {
     }
   } catch (error) {
     message.error('删除失败，' + getErrorMessage(error))
+  } finally {
+    deleting.value = false
   }
 }
 

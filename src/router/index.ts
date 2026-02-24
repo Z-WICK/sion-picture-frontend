@@ -4,18 +4,12 @@ import LandingPage from '@/pages/LandingPage.vue'
 import UserLoginPage from '@/pages/user/UserLoginPage.vue'
 import UserRegisterPage from '@/pages/user/UserRegisterPage.vue'
 import UserProfilePage from '@/pages/user/UserProfilePage.vue'
-import UserManagePage from '@/pages/admin/UserManagePage.vue'
-import PictureManagePage from '@/pages/admin/PictureManagePage.vue'
-import SpaceManagePage from '@/pages/admin/SpaceManagePage.vue'
 import AddPicturePage from '@/pages/picture/AddPicturePage.vue'
 import AddPictureBatchPage from '@/pages/picture/AddPictureBatchPage.vue'
-import PictureDetailPage from '@/pages/picture/PictureDetailPage.vue'
 import AddSpacePage from '@/pages/space/AddSpacePage.vue'
 import MySpacePage from '@/pages/space/MySpacePage.vue'
 import SpaceDetailPage from '@/pages/space/SpaceDetailPage.vue'
-import SpaceAnalyzePage from '@/pages/space/SpaceAnalyzePage.vue'
 import SearchPicturePage from '@/pages/picture/SearchPicturePage.vue'
-import SpaceUserManagePage from '@/pages/admin/SpaceUserManagePage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,22 +45,22 @@ const router = createRouter({
     {
       path: '/admin/userManage',
       name: '用户管理',
-      component: UserManagePage,
+      component: () => import('@/pages/admin/UserManagePage.vue'),
     },
     {
       path: '/admin/pictureManage',
       name: '图片管理',
-      component: PictureManagePage,
+      component: () => import('@/pages/admin/PictureManagePage.vue'),
     },
     {
       path: '/admin/spaceManage',
       name: '空间管理',
-      component: SpaceManagePage,
+      component: () => import('@/pages/admin/SpaceManagePage.vue'),
     },
     {
       path: '/spaceUserManage/:id',
       name: '空间成员管理',
-      component: SpaceUserManagePage,
+      component: () => import('@/pages/admin/SpaceUserManagePage.vue'),
       props: true,
     },
     {
@@ -82,7 +76,7 @@ const router = createRouter({
     {
       path: '/picture/:id',
       name: '图片详情',
-      component: PictureDetailPage,
+      component: () => import('@/pages/picture/PictureDetailPage.vue'),
       props: true,
     },
     {
@@ -104,7 +98,7 @@ const router = createRouter({
     {
       path: '/space_analyze',
       name: '空间分析',
-      component: SpaceAnalyzePage,
+      component: () => import('@/pages/space/SpaceAnalyzePage.vue'),
     },
     {
       path: '/search_picture',

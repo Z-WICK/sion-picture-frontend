@@ -159,6 +159,7 @@
           :columns="columns"
           :data-source="dataList"
           :pagination="pagination"
+          :loading="loading"
           :size="tableSize"
           :scroll="{ x: 1220 }"
           @change="doTableChange"
@@ -192,7 +193,16 @@
                 <a-button type="link" :href="`/add_space?id=${record.id}`" target="_blank">
                   编辑
                 </a-button>
-                <a-button danger @click="doDelete(record.id)">删除</a-button>
+                <a-popconfirm
+                  title="确认删除该空间吗？"
+                  ok-text="确认"
+                  cancel-text="取消"
+                  @confirm="doDelete(record.id)"
+                >
+                  <a-button danger :loading="deletingId === record.id" :disabled="deletingId === record.id">
+                    删除
+                  </a-button>
+                </a-popconfirm>
               </a-space>
             </template>
           </template>
@@ -261,6 +271,8 @@ const columns = [
 
 const dataList = ref<API.Space[]>([])
 const total = ref(0)
+const loading = ref(false)
+const deletingId = ref<number>()
 const showAdvancedFilters = ref(false)
 const tableDensity = ref<Density>('comfortable')
 
@@ -361,6 +373,7 @@ const formatUsageRatio = (used?: number, max?: number) => {
 }
 
 const fetchData = async () => {
+  loading.value = true
   try {
     const res = await postSpaceListPage({
       ...searchParams,
@@ -376,6 +389,8 @@ const fetchData = async () => {
     const errorMessage =
       maybeResponse?.data?.message ?? (error instanceof Error ? error.message : String(error))
     message.error('获取数据失败，' + errorMessage)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -417,6 +432,10 @@ const doDelete = async (id?: number) => {
   if (!id) {
     return
   }
+  if (deletingId.value === id) {
+    return
+  }
+  deletingId.value = id
   try {
     const res = await postSpaceOpenApiDelete({ id })
     if (res.data.code === 0) {
@@ -430,6 +449,8 @@ const doDelete = async (id?: number) => {
     const errorMessage =
       maybeResponse?.data?.message ?? (error instanceof Error ? error.message : String(error))
     message.error('删除失败，' + errorMessage)
+  } finally {
+    deletingId.value = undefined
   }
 }
 </script>

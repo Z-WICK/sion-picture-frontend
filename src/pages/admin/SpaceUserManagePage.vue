@@ -146,14 +146,21 @@
               </template>
               <template v-else-if="column.key === 'action'">
                 <a-space wrap>
-                  <a-button
-                    type="link"
-                    danger
-                    :disabled="isLastAdmin(record)"
-                    @click="doDelete(record.id, record)"
+                  <a-popconfirm
+                    title="确认移除该成员吗？"
+                    ok-text="确认"
+                    cancel-text="取消"
+                    @confirm="doDelete(record.id, record)"
                   >
-                    删除
-                  </a-button>
+                    <a-button
+                      type="link"
+                      danger
+                      :loading="deletingId === record.id"
+                      :disabled="isLastAdmin(record) || deletingId === record.id"
+                    >
+                      删除
+                    </a-button>
+                  </a-popconfirm>
                 </a-space>
               </template>
             </template>
@@ -207,6 +214,7 @@ const columns = [
 
 const dataList = ref<API.SpaceUserVO[]>([])
 const spaceNotFound = ref(false)
+const deletingId = ref<number>()
 const memberCount = computed(() => dataList.value.length)
 const memberKeyword = ref('')
 const memberRoleFilter = ref<'all' | 'admin' | 'editor' | 'viewer'>('all')
@@ -295,9 +303,10 @@ const fetchData = async () => {
     const res = await postSpaceUserList({
       spaceId,
     })
-    if (res.data.code === 0 && res.data.data) {
+    if (res.data.code === 0) {
       spaceNotFound.value = false
-      dataList.value = res.data.data ?? []
+      const payload = res.data.data
+      dataList.value = Array.isArray(payload) ? payload : (payload?.records ?? [])
     } else if (res.data.code === 404 || res.data.code === 40400) {
       spaceNotFound.value = true
       dataList.value = []
@@ -432,10 +441,14 @@ const doDelete = async (id?: number, record?: API.SpaceUserVO) => {
       message.warning('成员不存在，无法删除')
       return
     }
+    if (deletingId.value === id) {
+      return
+    }
     if (record && isLastAdmin(record)) {
       message.warning('至少保留一个管理员')
       return
     }
+    deletingId.value = id
     const res = await postSpaceUserOpenApiDelete({ id })
     if (res.data.code === 0) {
       message.success('删除成功')
@@ -450,6 +463,8 @@ const doDelete = async (id?: number, record?: API.SpaceUserVO) => {
       return
     }
     message.error('删除失败，' + getErrorMessage(error))
+  } finally {
+    deletingId.value = undefined
   }
 }
 </script>

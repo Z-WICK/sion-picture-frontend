@@ -13,15 +13,18 @@
               <div class="context-main">
                 <div class="context-main-copy">
                   <h1 class="context-title">{{ currentRouteTitle }}</h1>
-                  <div class="context-breadcrumb" aria-label="当前路径">
-                    <span
-                      v-for="(label, index) in breadcrumbLabels"
-                      :key="`${label}-${index}`"
-                      class="breadcrumb-item"
-                    >
-                      {{ label }}
-                    </span>
-                  </div>
+                  <nav class="context-breadcrumb" aria-label="当前路径">
+                    <ol class="breadcrumb-list">
+                      <li
+                        v-for="(label, index) in breadcrumbLabels"
+                        :key="`${label}-${index}`"
+                        class="breadcrumb-item"
+                        :aria-current="index === breadcrumbLabels.length - 1 ? 'page' : undefined"
+                      >
+                        {{ label }}
+                      </li>
+                    </ol>
+                  </nav>
                 </div>
                 <div class="context-meta">
                   <span class="context-chip">{{ currentRoutePath }}</span>
@@ -265,6 +268,12 @@ watch(
 
 #basicLayout .context-breadcrumb {
   margin-top: 5px;
+}
+
+#basicLayout .breadcrumb-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -281,6 +290,12 @@ watch(
   align-items: center;
   font-size: 11px;
   color: #5e7590;
+}
+
+#basicLayout .breadcrumb-item[aria-current='page'] {
+  border-color: #b6c9dd;
+  color: #35506f;
+  font-weight: 600;
 }
 
 #basicLayout .context-meta {

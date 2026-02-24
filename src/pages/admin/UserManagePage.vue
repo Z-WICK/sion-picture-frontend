@@ -130,6 +130,7 @@
           :columns="columns"
           :data-source="dataList"
           :pagination="pagination"
+          :loading="loading"
           :size="tableSize"
           :scroll="{ x: 1020 }"
           @change="doTableChange"
@@ -149,7 +150,16 @@
               {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
             <template v-else-if="column.key === 'action'">
-              <a-button danger @click="doDelete(record.id)">删除</a-button>
+              <a-popconfirm
+                title="确认删除该用户吗？"
+                ok-text="确认"
+                cancel-text="取消"
+                @confirm="doDelete(record.id)"
+              >
+                <a-button danger :loading="deletingId === record.id" :disabled="deletingId === record.id">
+                  删除
+                </a-button>
+              </a-popconfirm>
             </template>
           </template>
         </a-table>
@@ -212,6 +222,8 @@ const columns = [
 
 const dataList = ref<API.UserVO[]>([])
 const total = ref(0)
+const loading = ref(false)
+const deletingId = ref<number>()
 const showAdvancedFilters = ref(false)
 const tableDensity = ref<Density>('comfortable')
 const roleQuickOptions = [
@@ -301,6 +313,7 @@ const setTableDensity = (mode: Density) => {
 }
 
 const fetchData = async () => {
+  loading.value = true
   try {
     const res = await postUserListPageVo({
       ...searchParams,
@@ -316,6 +329,8 @@ const fetchData = async () => {
     const errorMessage =
       maybeResponse?.data?.message ?? (error instanceof Error ? error.message : String(error))
     message.error('获取数据失败，' + errorMessage)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -357,6 +372,10 @@ const doDelete = async (id?: number) => {
     message.warning('请先选择用户')
     return
   }
+  if (deletingId.value === id) {
+    return
+  }
+  deletingId.value = id
   try {
     const res = await postUserOpenApiDelete({ id })
     if (res.data.code === 0) {
@@ -370,6 +389,8 @@ const doDelete = async (id?: number) => {
     const errorMessage =
       maybeResponse?.data?.message ?? (error instanceof Error ? error.message : String(error))
     message.error('删除失败，' + errorMessage)
+  } finally {
+    deletingId.value = undefined
   }
 }
 </script>

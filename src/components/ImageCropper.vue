@@ -7,7 +7,7 @@
     @cancel="closeModal"
   >
     <!-- 图片裁切组件 -->
-    <vue-cropper
+    <VueCropper
       ref="cropperRef"
       :img="imageUrl"
       output-type="png"
@@ -46,10 +46,12 @@
 import { computed, onUnmounted, ref, watchEffect } from 'vue'
 import { postPictureUpload } from '@/api/picture'
 import { message } from 'ant-design-vue'
+import { VueCropper } from 'vue-cropper'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import PictureEditWebSocket from '@/utils/pictureEditWebSocket.ts'
 import { PICTURE_EDIT_ACTION_ENUM, PICTURE_EDIT_MESSAGE_TYPE_ENUM } from '@/constants/picture.ts'
 import { SPACE_TYPE_ENUM } from '@/constants/space.ts'
+import 'vue-cropper/dist/index.css'
 
 interface Props {
   imageUrl?: string

@@ -94,15 +94,24 @@
               >
                 <EditOutlined />
               </button>
-              <button
+              <a-popconfirm
                 v-if="canDelete"
-                type="button"
-                class="action-btn"
-                aria-label="删除图片"
-                @click="(e) => doDelete(picture, e)"
+                title="确认删除这张图片吗？"
+                ok-text="确认"
+                cancel-text="取消"
+                @confirm="doDelete(picture)"
               >
-                <DeleteOutlined />
-              </button>
+                <button
+                  type="button"
+                  class="action-btn"
+                  aria-label="删除图片"
+                  :disabled="deletingId === picture.id"
+                  @click="(e) => e.stopPropagation()"
+                >
+                  <LoadingOutlined v-if="deletingId === picture.id" />
+                  <DeleteOutlined v-else />
+                </button>
+              </a-popconfirm>
             </template>
           </a-card>
         </a-list-item>
@@ -117,6 +126,7 @@ import { useRouter } from 'vue-router'
 import {
   DeleteOutlined,
   EditOutlined,
+  LoadingOutlined,
   SearchOutlined,
   ShareAltOutlined,
 } from '@ant-design/icons-vue'
@@ -328,6 +338,7 @@ const getPictureFormatText = (picture: API.PictureVO) => {
 }
 
 const router = useRouter()
+const deletingId = ref<number>()
 // 跳转至图片详情页
 const doClickPicture = (picture: API.PictureVO) => {
   router.push({
@@ -358,19 +369,28 @@ const doEdit = (picture: API.PictureVO, e: MouseEvent) => {
 }
 
 // 删除数据
-const doDelete = async (picture: API.PictureVO, e: MouseEvent) => {
-  // 阻止冒泡
-  e.stopPropagation()
+const doDelete = async (picture: API.PictureVO) => {
   const id = picture.id
   if (!id) {
     return
   }
-  const res = await postPictureOpenApiDelete({ id })
-  if (res.data.code === 0) {
-    message.success('删除成功')
-    props.onReload?.()
-  } else {
-    message.error('删除失败')
+  if (deletingId.value === id) {
+    return
+  }
+  deletingId.value = id
+  try {
+    const res = await postPictureOpenApiDelete({ id })
+    if (res.data.code === 0) {
+      message.success('删除成功')
+      props.onReload?.()
+    } else {
+      message.error('删除失败，' + res.data.message)
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    message.error('删除失败，' + errorMessage)
+  } finally {
+    deletingId.value = undefined
   }
 }
 
